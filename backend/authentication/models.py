@@ -25,22 +25,21 @@ class CustomUserManager(BaseUserManager):
 class User(AbstractUser):
     email = models.EmailField(unique=True)
     username = None
-    
     name = models.CharField(max_length=100)
-    postal_code = models.IntegerField()
-    city = models.CharField(max_length=100)
-    adress = models.CharField(max_length=500)
-    country = models.CharField(max_length=30)
-    price_per_month = models.IntegerField()
+    postal_code = models.IntegerField(null=True, default=0)
+    city = models.CharField(max_length=100,null=True, default='')
+    adress = models.CharField(max_length=500,null=True, default='')
+    country = models.CharField(max_length=30,null=True, default='')
+    price_per_month = models.IntegerField(default=0)
     market = models.ForeignKey(Market,null=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['name']
 
     objects = CustomUserManager()
 
     def __str__(self):
-        return self.name
+        return self.email
 
