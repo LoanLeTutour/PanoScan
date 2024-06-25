@@ -1,7 +1,7 @@
 from rest_framework import viewsets
-from .models import Item
-from .serializers import ItemSerializer
 
-class ItemViewSet(viewsets.ModelViewSet):
-    queryset = Item.objects.all()
-    serializer_class = ItemSerializer
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+@login_required
+def home(request):
+    return render(request, 'panoscan/home.html')

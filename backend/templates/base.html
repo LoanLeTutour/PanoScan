@@ -1,0 +1,17 @@
+
+<html>
+    <head>
+        <title>PanoScan</title>
+    </head>
+    <body>
+        <h1>PanoScan</h1>
+        {% block content %}{% endblock content %}
+        {%  if user.is_authenticated %}
+            <p>Vous êtes connecté en tant que {{ request.user }}.</p>
+            <form method="POST" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit">Se déconnecter</button>
+            </form>
+        {% endif %}
+    </body>
+</html>
