@@ -19,10 +19,17 @@ from django.contrib import admin
 from django.urls import include, path
 from django.contrib.auth.views import LoginView, LogoutView
 import panoscan.views
+from panoscan.views import DecorViewset
+from rest_framework import routers
+
+router = routers.SimpleRouter()
+router.register('decor', DecorViewset, basename='decor')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', LoginView.as_view(template_name='authentication/login.html',redirect_authenticated_user=True),name='login'),
     path('home/', panoscan.views.home, name='home'),
     path('logout/', LogoutView.as_view(), name='logout'),
+    path('api-auth/', include('rest_framework.urls')),
+    path('api/', include(router.urls))
 ]

@@ -55,6 +55,8 @@ class PhotoUser(models.Model):
 class DecorsForCollection(models.Model):
     decor = models.ForeignKey(Decor, on_delete=models.CASCADE)
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
+    def __str__(self) -> str:
+        return f'{self.decor.code} - {self.collection.name}'
     class Meta:
         unique_together = ('decor', 'collection')
 
