@@ -10,7 +10,7 @@ class Producer(models.Model):
     def __str__(self) -> str:
         return self.name
 
-class PanelType(models.Model):
+class ProductType(models.Model):
     name = models.CharField(max_length=100)
     length_in_mm = models.IntegerField()
     width_in_mm = models.IntegerField()
@@ -64,7 +64,7 @@ class DecorsForCollection(models.Model):
 class StructuresForDecor(models.Model):
     decor = models.ForeignKey(Decor, on_delete=models.CASCADE)
     structure = models.ForeignKey(Structure, on_delete=models.CASCADE)
-    panel_type = models.ManyToManyField(PanelType, through='PanelTypesForStructureDecorCombination')
+    panel_type = models.ManyToManyField(ProductType, through='FinalProduct')
     
     def __str__(self) -> str:
         return f'{self.decor.code} {self.structure.code}'
@@ -72,8 +72,10 @@ class StructuresForDecor(models.Model):
         unique_together = ('decor', 'structure')
     
 
-class PanelTypesForStructureDecorCombination(models.Model):
+class FinalProduct(models.Model):
     decor_structure_combination = models.ForeignKey(StructuresForDecor, on_delete=models.CASCADE, default=1)
-    panel_type = models.ForeignKey(PanelType, on_delete=models.CASCADE)
+    product_type = models.ForeignKey(ProductType, on_delete=models.CASCADE)
+    def __str__(self) -> str:
+        return f'{self.product_type.name}-{self.decor_structure_combination.decor.code}{self.decor_structure_combination.structure.code}-{self.product_type.thickness_in_mm}mm'
     class Meta:
-        unique_together = ('decor_structure_combination', 'panel_type')
+        unique_together = ('decor_structure_combination', 'product_type')
