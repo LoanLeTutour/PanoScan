@@ -56,7 +56,7 @@ class DecorsForCollection(models.Model):
     decor = models.ForeignKey(Decor, on_delete=models.CASCADE)
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
     def __str__(self) -> str:
-        return f'{self.decor.code} - {self.collection.name}'
+        return f'{self.decor.code}-{self.collection.name}-{self.collection.market.name}'
     class Meta:
         unique_together = ('decor', 'collection')
 
