@@ -19,13 +19,14 @@ from django.contrib import admin
 from django.urls import include, path
 from django.contrib.auth.views import LoginView, LogoutView
 import panoscan.views
-from panoscan.views import DecorViewset, MarketViewset, ProducerViewset, ProductTypeViewset, CollectionViewset, DecorsForCollectionViewset, StructuresForDecorViewset, FinalProductViewset
+from panoscan.views import DecorViewset, MarketViewset,StructureViewset, ProducerViewset, ProductTypeViewset, CollectionViewset, DecorsForCollectionViewset, StructuresForDecorViewset, FinalProductViewset
 from rest_framework import routers
 
 router = routers.SimpleRouter()
 router.register('decor', DecorViewset, basename='decor')
 router.register('market', MarketViewset, basename='market')
 router.register('producer', ProducerViewset, basename='producer')
+router.register('structure', StructureViewset, basename='structure')
 router.register('product_type', ProductTypeViewset, basename='product_type')
 router.register('collection', CollectionViewset, basename='collection')
 router.register('decors_per_collection', DecorsForCollectionViewset, basename='decors_per_collection')
