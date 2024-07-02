@@ -103,14 +103,14 @@ class DecorsForCollectionListSerializer(ModelSerializer):
         fields = ['decor','collection']
 
 class StructuresForDecorSerializer(ModelSerializer):
-    product_type = SerializerMethodField()
+    product_types = SerializerMethodField()
     decor_collection = DecorsForCollectionListSerializer()
     structure = StructureListSerializer()
     class Meta:
         model = StructuresForDecor
-        fields = ['id', 'decor_collection', 'structure', 'product_type']
+        fields = ['id', 'decor_collection', 'structure', 'product_types']
     def get_product_type(self, instance):
-        queryset = instance.product_type.filter(active=True)
+        queryset = instance.product_types.filter(active=True)
         serializer = ProductTypeListSerializer(queryset, many=True)
         return serializer.data
 
