@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from rest_framework.serializers import ModelSerializer, SerializerMethodField, ValidationError
 
 from panoscan.models import Market, Producer, ProductType, Structure, Collection, Decor, FinalProduct, StructuresForDecor, DecorsForCollection, PhotoTraining, PhotoUser
 
@@ -13,6 +13,10 @@ class MarketListSerializer(ModelSerializer):
     class Meta:
         model = Market
         fields = ['name']
+    def validate_name(self, value):
+        if Market.objects.filter(name=value).exists():
+            raise ValidationError('This market already exists')
+        return value
 
 # Producer serializers
 class ProducerDetailSerializer(ModelSerializer):
@@ -24,6 +28,10 @@ class ProducerListSerializer(ModelSerializer):
     class Meta: 
         model = Producer
         fields = ['name']
+    def validate_name(self, value):
+        if Producer.objects.filter(name=value).exists():
+            raise ValidationError('This market already exists')
+        return value
 
 # Structure serializers
 class StructureDetailSerializer(ModelSerializer):

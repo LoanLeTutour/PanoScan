@@ -1,5 +1,5 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-from django.db import models
+from django.db import models, transaction
 from panoscan.models import Market
 
 class CustomUserManager(BaseUserManager):
@@ -31,9 +31,9 @@ class User(AbstractUser):
     adress = models.CharField(max_length=500,null=True, default='')
     country = models.CharField(max_length=30,null=True, default='')
     price_per_month = models.IntegerField(default=0)
-    market = models.ForeignKey(Market,null=True, on_delete=models.SET_NULL)
+    market = models.ForeignKey(Market,null=True, on_delete=models.SET_NULL, related_name='users')
     created_at = models.DateTimeField(auto_now_add=True)
-    is_active = models.BooleanField(default=True)
+    active = models.BooleanField(default=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['name']
@@ -42,4 +42,11 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+    @transaction.atomic
+    def disable(self):
+        if self.active is False:
+            return
+        self.active = False
+        self.save()
+        self.photos_user.update(active=False)
 

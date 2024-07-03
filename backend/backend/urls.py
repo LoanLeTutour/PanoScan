@@ -14,12 +14,13 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.contrib import admin
 from django.urls import include, path
 from django.contrib.auth.views import LoginView, LogoutView
 import panoscan.views
 from panoscan.views import DecorViewset, MarketViewset,StructureViewset, ProducerViewset, ProductTypeViewset, CollectionViewset, DecorsForCollectionViewset, StructuresForDecorViewset, FinalProductViewset
+from panoscan.views import AdminDecorViewset, AdminMarketViewset, AdminStructureViewset, AdminProducerViewset, AdminProductTypeViewset, AdminCollectionViewset, AdminDecorsForCollectionViewset, AdminStructuresForDecorViewset, AdminFinalProductViewset
 from rest_framework import routers
 
 router = routers.SimpleRouter()
@@ -32,6 +33,15 @@ router.register('collection', CollectionViewset, basename='collection')
 router.register('decors_per_collection', DecorsForCollectionViewset, basename='decors_per_collection')
 router.register('structures_per_decor', StructuresForDecorViewset, basename='structures_per_decor')
 router.register('final_product', FinalProductViewset, basename='final_product')
+router.register('admin/decor', AdminDecorViewset, basename='admin-decor')
+router.register('admin/market', AdminMarketViewset, basename='admin-market')
+router.register('admin/producer', AdminProducerViewset, basename='admin-producer')
+router.register('admin/structure', AdminStructureViewset, basename='admin-structure')
+router.register('admin/product_type', AdminProductTypeViewset, basename='admin-product_type')
+router.register('admin/collection', AdminCollectionViewset, basename='admin-collection')
+router.register('admin/decors_per_collection', AdminDecorsForCollectionViewset, basename='admin-decors_per_collection')
+router.register('admin/structures_per_decor', AdminStructuresForDecorViewset, basename='admin-structures_per_decor')
+router.register('admin/final_product', AdminFinalProductViewset, basename='admin-final_product')
 
 
 
@@ -41,5 +51,7 @@ urlpatterns = [
     path('home/', panoscan.views.home, name='home'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('api-auth/', include('rest_framework.urls')),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/', include(router.urls))
 ]
