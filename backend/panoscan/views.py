@@ -16,7 +16,7 @@ from panoscan.serializers import FinalProductSerializer
 from panoscan.serializers import StructuresForDecorSerializer
 from panoscan.serializers import DecorsForCollectionListSerializer, DecorsForCollectionDetailSerializer
 
-from panoscan.permissions import IsAdminAuthenticated
+from panoscan.permissions import IsAdminAuthenticated, IsStaffAuthenticated
 
 
 @login_required
@@ -44,9 +44,8 @@ class MarketViewset(MultipleSerializerMixin, ReadOnlyModelViewSet):
 class AdminMarketViewset(MultipleSerializerMixin, ModelViewSet):
     serializer_class = MarketListSerializer
     detail_serializer_class = MarketDetailSerializer
-    permission_classes = [IsAdminAuthenticated]
-    def get_queryset(self):
-        return Market.objects.all()
+    permission_classes = [IsAdminAuthenticated, IsStaffAuthenticated]
+    queryset = Market.objects.all()
     
 class ProducerViewset(MultipleSerializerMixin, ReadOnlyModelViewSet):
     serializer_class = ProducerListSerializer
@@ -61,9 +60,8 @@ class ProducerViewset(MultipleSerializerMixin, ReadOnlyModelViewSet):
 class AdminProducerViewset(MultipleSerializerMixin, ModelViewSet):
     serializer_class = ProducerListSerializer
     detail_serializer_class = ProducerDetailSerializer
-    permission_classes = [IsAdminAuthenticated]
-    def get_queryset(self):
-        return Producer.objects.all()
+    permission_classes = [IsAdminAuthenticated, IsStaffAuthenticated]
+    queryset = Producer.objects.all()
 
 class ProductTypeViewset(MultipleSerializerMixin, ReadOnlyModelViewSet):
     serializer_class = ProductTypeListSerializer
@@ -82,9 +80,8 @@ class ProductTypeViewset(MultipleSerializerMixin, ReadOnlyModelViewSet):
 class AdminProductTypeViewset(MultipleSerializerMixin, ModelViewSet):
     serializer_class = ProductTypeListSerializer
     detail_serializer_class = ProductTypeDetailSerializer
-    permission_classes = [IsAdminAuthenticated]
-    def get_queryset(self):
-        return ProductType.objects.all()
+    permission_classes = [IsAdminAuthenticated, IsStaffAuthenticated]
+    queryset = ProductType.objects.all()
     
 class StructureViewset(MultipleSerializerMixin, ReadOnlyModelViewSet):
     serializer_class = StructureListSerializer
@@ -103,9 +100,8 @@ class StructureViewset(MultipleSerializerMixin, ReadOnlyModelViewSet):
 class AdminStructureViewset(MultipleSerializerMixin, ModelViewSet):
     serializer_class = StructureListSerializer
     detail_serializer_class = StructureDetailSerializer
-    permission_classes = [IsAdminAuthenticated]
-    def get_queryset(self):
-        return Structure.objects.all()
+    permission_classes = [IsAdminAuthenticated, IsStaffAuthenticated]
+    queryset = Structure.objects.all()
     
 class CollectionViewset(MultipleSerializerMixin, ReadOnlyModelViewSet):
     serializer_class = CollectionListSerializer
@@ -127,9 +123,8 @@ class CollectionViewset(MultipleSerializerMixin, ReadOnlyModelViewSet):
 class AdminCollectionViewset(MultipleSerializerMixin, ModelViewSet):
     serializer_class = CollectionListSerializer
     detail_serializer_class = CollectionDetailSerializer
-    permission_classes = [IsAdminAuthenticated]
-    def get_queryset(self):
-        return Collection.objects.all()
+    permission_classes = [IsAdminAuthenticated, IsStaffAuthenticated]
+    queryset = Collection.objects.all()
     
 class DecorViewset(MultipleSerializerMixin, ReadOnlyModelViewSet):
     serializer_class = DecorListSerializer
@@ -148,9 +143,8 @@ class DecorViewset(MultipleSerializerMixin, ReadOnlyModelViewSet):
 class AdminDecorViewset(MultipleSerializerMixin, ModelViewSet):
     serializer_class = DecorListSerializer
     detail_serializer_class = DecorDetailSerializer
-    permission_classes = [IsAdminAuthenticated]
-    def get_queryset(self):
-        return Decor.objects.all()
+    permission_classes = [IsAdminAuthenticated, IsStaffAuthenticated]
+    queryset = Decor.objects.all()
 
 class DecorsForCollectionViewset(MultipleSerializerMixin, ReadOnlyModelViewSet):
     serializer_class = DecorsForCollectionListSerializer
@@ -172,9 +166,8 @@ class DecorsForCollectionViewset(MultipleSerializerMixin, ReadOnlyModelViewSet):
 class AdminDecorsForCollectionViewset(MultipleSerializerMixin, ModelViewSet):
     serializer_class = DecorsForCollectionListSerializer
     detail_serializer_class = DecorsForCollectionDetailSerializer
-    permission_classes = [IsAdminAuthenticated]
-    def get_queryset(self):
-        return DecorsForCollection.objects.all()
+    permission_classes = [IsAdminAuthenticated, IsStaffAuthenticated]
+    queryset = DecorsForCollection.objects.all()
 class StructuresForDecorViewset(ReadOnlyModelViewSet):
     serializer_class = StructuresForDecorSerializer
     def get_queryset(self):
@@ -193,9 +186,8 @@ class StructuresForDecorViewset(ReadOnlyModelViewSet):
 
 class AdminStructuresForDecorViewset(ModelViewSet):
     serializer_class = StructuresForDecorSerializer
-    permission_classes = [IsAdminAuthenticated]
-    def get_queryset(self):
-        return StructuresForDecor.objects.all()
+    permission_classes = [IsAdminAuthenticated, IsStaffAuthenticated]
+    queryset = StructuresForDecor.objects.all()
     
 class FinalProductViewset(ReadOnlyModelViewSet):
     serializer_class = FinalProductSerializer
@@ -204,9 +196,8 @@ class FinalProductViewset(ReadOnlyModelViewSet):
 
 class AdminFinalProductViewset(ModelViewSet):
     serializer_class = FinalProductSerializer
-    permission_classes = [IsAdminAuthenticated]
-    def get_queryset(self):
-        return FinalProduct.objects.all()
+    permission_classes = [IsAdminAuthenticated, IsStaffAuthenticated]
+    queryset = FinalProduct.objects.all()
 
     
 
