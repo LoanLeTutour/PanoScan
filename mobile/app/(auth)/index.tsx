@@ -1,29 +1,26 @@
-import { UseWarmUpBrowser } from "@/hooks/UseWarmUpBrowser";
-import { useState, useEffect } from "react";
-import { View, Text, Image, TextInput, TouchableOpacity } from "react-native";
-import { useSignIn } from "@clerk/clerk-expo";
-import { useRouter, useNavigation } from "expo-router";
+import { useState} from "react";
+import { View, Text,TextInput, TouchableOpacity } from "react-native";
+import { useRouter} from "expo-router";
+import authService from '../authService';
 
 import styles from "./index.styles";
 
-const LogIn = () => {
+const LogInScreen: React.FC = () => {
   const router = useRouter();
-  UseWarmUpBrowser();
 
-  const { signIn, setActive, isLoaded } = useSignIn();
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [mailPlaceholder, setMailPlaceholder] = useState<string>("Adresse mail");
+  const [passwordPlaceholder, setPasswordPlaceholder] = useState<string>("Mot de passe");
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
-  const [emailAddress, setEmailAddress] = useState("");
-  const [password, setPassword] = useState("");
-  const [mailPlaceholder, setMailPlaceholder] = useState("Adresse mail");
-  const [passwordPlaceholder, setPasswordPlaceholder] =
-    useState("Mot de passe");
   const checkInputs = () => {
     if (checkMailInput() && checkPasswordInput()) {
-      onSignInPress();
+      handleLogin();
     }
   };
   const checkMailInput = () => {
-    if (emailAddress === "") {
+    if (email === "") {
       setMailPlaceholder("Entrez votre adresse mail");
       return false;
     }
@@ -37,32 +34,19 @@ const LogIn = () => {
     }
     return true;
   };
-  const onSignInPress = async () => {
-    if (!isLoaded) {
-      return;
-    }
 
+  const handleLogin = async () => {
     try {
-      const completeSignIn = await signIn.create({
-        identifier: emailAddress,
-        password,
-      });
-      // This is an important step,
-      // This indicates the user is signed in
-      await setActive({ session: completeSignIn.createdSessionId });
-    } catch (err: any) {
-      console.log(err, "login erreur");
+      await authService.login(email, password);
+      router.replace('(tabs)'); // Navigation vers l'écran d'accueil après connexion réussie
+    } catch (error) {
+      setErrorMessage('Invalid email or password');
     }
   };
-  const navigation = useNavigation();
-
-  useEffect(() => {
-    navigation.setOptions({ headerShown: false });
-  }, [navigation]);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>ScanMate</Text>
+      <Text style={styles.title}>PanoScan</Text>
       <View style={styles.formContainer}>
         <Text style={styles.titleForm}>Identification</Text>
         <View style={styles.inputArea}>
@@ -71,9 +55,9 @@ const LogIn = () => {
             keyboardType="email-address"
             style={styles.inputField}
             placeholder={mailPlaceholder}
-            value={emailAddress}
-            onChangeText={(emailAddress: string) =>
-              setEmailAddress(emailAddress)
+            value={email}
+            onChangeText={(email: string) =>
+              setEmail(email)
             }
           />
           <TextInput
@@ -87,8 +71,8 @@ const LogIn = () => {
             onChangeText={(password: string) => setPassword(password)}
           />
         </View>
-
-        <TouchableOpacity style={styles.btn} onPress={onSignInPress}>
+        {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
+        <TouchableOpacity style={styles.btn} onPress={checkInputs}>
           <Text style={styles.btnText}>Suivant</Text>
         </TouchableOpacity>
       </View>
@@ -96,4 +80,4 @@ const LogIn = () => {
   );
 };
 
-export default LogIn;
+export default LogInScreen;

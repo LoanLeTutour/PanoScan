@@ -1,4 +1,4 @@
-import Colors from "@/constants/Colors";
+import {Colors} from "../../constants/Colors";
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
@@ -53,6 +53,10 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
+    error: {
+        color: 'red',
+        marginBottom: 12,
+      },
 
 })
 

@@ -1,4 +1,4 @@
-import Colors from "@/constants/Colors";
+import {Colors} from "@/constants/Colors";
 import { StyleSheet } from "react-native"
 
 const styles = StyleSheet.create({
@@ -6,51 +6,35 @@ const styles = StyleSheet.create({
         flex:1,
         backgroundColor: Colors.white,
         alignItems: 'center',
-    },
-    containerPermission: {
-        flex:1,
-        backgroundColor: Colors.primary,
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 20,
-    },
-    textPermission: {
-        textAlign: 'center',
-        color: Colors.white,
-        fontSize: 30,
-        fontWeight: 'bold',
-    },
-    buttonPermission: {
-        backgroundColor: Colors.secondary,
-        padding: 20,
-        borderRadius: 10,
-
-    },
-    textButtonPermission: {
-        color: Colors.white,
-        fontSize: 20,
-        fontWeight: 'bold',
+        
     },
     camera: {
         flex:1,
         borderRadius: 20,
-        padding: 20,
+        padding: 30,
+    },
+    buttonsContainer: {
+        justifyContent: 'space-between',
     },
     topButtonsContainer:{
         flex: 1,
-        alignItems: 'flex-start',
+        alignItems: 'flex-end',
         gap: 30,
+        marginRight: 20,
+        marginTop: 30
+    },
+    icons:{
+        height: 30,
+        width: 30,
     },
     bottomButtonsContainer: {
         flexDirection: 'row',
     },
+    
     uploadingButton: {
         marginLeft: '35%',
     },
-    buttonsContainer: {
-        flex: 1,
-        justifyContent: 'space-between',
-    },
+    
     capturingButtonContainer:{
         borderRadius:70,
         borderColor:Colors.white,
@@ -65,10 +49,7 @@ const styles = StyleSheet.create({
         borderWidth: 5,
         borderColor: Colors.black,
     },
-    icons:{
-        height: 30,
-        width: 30,
-    },
+    
     resultContainer:{
         flex: 1,
         width: '100%',

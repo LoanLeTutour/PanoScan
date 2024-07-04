@@ -3,10 +3,10 @@ import {
   View,
   Text,
   TouchableOpacity,
-  useWindowDimensions,
   Image,
+  Button
 } from "react-native";
-import { Camera, CameraType, FlashMode } from "expo-camera";
+import { CameraView, useCameraPermissions, CameraType, FlashMode } from "expo-camera";
 import { Ionicons } from "@expo/vector-icons";
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
@@ -31,64 +31,57 @@ const imagePickerOptions : ImagePicker.ImagePickerOptions = {
 
 
 const Page = () => {
-  const [permission, requestPermission] = Camera.useCameraPermissions();
+  const [permission, requestPermission] = useCameraPermissions();
   const [image, setImage] = useState<string>("");
 
-  const [type, setType] = useState(CameraType.back);
-  const [flashMode, setflashMode] = useState(FlashMode.off);
-  const cameraRef = useRef(null);
+  const [facing, setFacing] = useState<CameraType>('back');
+  const [flashMode, setflashMode] = useState<FlashMode>('off');
+  const cameraRef = useRef<CameraView>(null);
 
-  const { width } = useWindowDimensions();
-  const height = Math.round((width * 16) / 9);
+  if (!permission) {
+    // Camera permissions are still loading.
+    return <View />;
+  }
 
-  if (!permission || !permission.granted) {
+  if (!permission.granted) {
+    // Camera permissions are not granted yet.
     return (
-      <View style={styles.containerPermission}>
-        <Text style={styles.textPermission}>
-          Une permission est nécessaire pour utiliser la caméra
-        </Text>
-        <TouchableOpacity
-          style={styles.buttonPermission}
-          onPress={requestPermission}
-        >
-          <Text style={styles.textButtonPermission}>
-            Demander la permission
-          </Text>
-        </TouchableOpacity>
+      <View style={styles.container}>
+        <Text style={{ textAlign: 'center'}}>Une permission d'accès à la caméra est requise</Text>
+        <Button onPress={requestPermission} title="donner la permission" />
       </View>
     );
   }
 
-  const toggleFlashMode = () => {
-    if (flashMode === FlashMode.off) {
-      setflashMode(FlashMode.on);
-    } else {
-      setflashMode(FlashMode.off);
-    }
-  };
+  const toggleCameraFacing = () => {
+    setFacing(current => (current === 'back' ? 'front' : 'back'));
+  console.log(facing)}
 
-  const toggleCameraType = () => {
-    setType((current) =>
-      (current === CameraType.back) ? CameraType.front : CameraType.back
-    );
-  };
+  const toggleFlashMode = () => {
+    setflashMode(current => (current === 'on' ? 'off' : 'on'));
+    console.log(flashMode)}
+
 
   const FlashIcon = () => {
-    if (flashMode === FlashMode.on) {
-      return (
-        <Ionicons
-          name="flash-off"
-          color="white"
-          size={30}
-          style={styles.icons}
-        />
-      );
-    } else {
-      return (
-        <Ionicons name="flash" color="white" size={30} style={styles.icons} />
-      );
+    if (flashMode === 'off') {
+      return(<Ionicons
+        name="flash-off"
+        color="white"
+        size={30}
+        style={styles.icons}
+      />)
     }
-  };
+    else {
+      return (<Ionicons 
+        name="flash" 
+        color="white" 
+        size={30} 
+        style={styles.icons} />)
+    }
+  }
+  
+
+
 
   const selectImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync(imagePickerOptions);
@@ -107,7 +100,7 @@ const Page = () => {
   }
 
   const takeAPicture = async () => {
-    if (cameraRef) {
+    if (cameraRef.current) {
       try {
         let photo = await cameraRef.current.takePictureAsync();
         console.log(photo);
@@ -139,7 +132,7 @@ const Page = () => {
         <View style={styles.buttonsResultContainer}>
           <TouchableOpacity
             style={styles.buttonTakenImage}
-            onPress={searchIdems}
+            onPress={sendToBackend}
           >
             <Text style={styles.textResult}>Tester</Text>
             <Ionicons name="search" color="white" size={30} />
@@ -158,13 +151,11 @@ const Page = () => {
 
   const displayCamera = () => {
     return (
-      <Camera
-        style={[styles.camera, { height: height, width: width }]}
-        type={type}
-        flashMode={flashMode}
+      <CameraView
+        style={styles.camera}
+        facing={facing}
+        flash={flashMode}
         ref={cameraRef}
-        autoFocus={true}
-        ratio="16:9"
         onCameraReady={displayTakePictureButton}
       >
         <View style={styles.buttonsContainer}>
@@ -172,7 +163,7 @@ const Page = () => {
             <TouchableOpacity onPress={toggleFlashMode}>
               <FlashIcon />
             </TouchableOpacity>
-            <TouchableOpacity onPress={toggleCameraType}>
+            <TouchableOpacity onPress={toggleCameraFacing}>
               <Ionicons name="camera-reverse" color="white" size={30} />
             </TouchableOpacity>
           </View>
@@ -188,11 +179,11 @@ const Page = () => {
             </View>
           </View>
         </View>
-      </Camera>
+      </CameraView>
     );
   };
 
-  const searchIdems = () => {};
+  const sendToBackend = () => {};
 
   return (
     <View style={styles.container}>

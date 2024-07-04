@@ -4,6 +4,7 @@ import React from 'react';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -11,7 +12,7 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: Colors.primary,
         headerShown: false,
       }}>
       <Tabs.Screen
@@ -30,6 +31,27 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="photo"
+        options={{
+          title: 'Photo',
+          tabBarLabel: 'Photo',
+          tabBarStyle: {backgroundColor: Colors.white },
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name='camera-sharp' color={color} size={size}/>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="history"
+        options={{
+          title: 'Historique',
+          tabBarStyle: {backgroundColor: Colors.white },
+          tabBarLabel: 'Historique',
+          tabBarIcon: ({color, size}) => 
+            <Ionicons name="images" color={color} size={size}/>,
         }}
       />
     </Tabs>
