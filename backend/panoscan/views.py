@@ -4,19 +4,21 @@ from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
+from rest_framework import status
+from rest_framework.decorators import api_view
 
-from panoscan.models import Market, Producer, ProductType, Structure, Collection, Decor, FinalProduct, StructuresForDecor, DecorsForCollection, PhotoTraining, PhotoUser
-from panoscan.serializers import MarketListSerializer, MarketDetailSerializer
-from panoscan.serializers import ProducerListSerializer,ProducerDetailSerializer
-from panoscan.serializers import ProductTypeListSerializer,ProductTypeDetailSerializer
-from panoscan.serializers import StructureListSerializer, StructureDetailSerializer
-from panoscan.serializers import CollectionListSerializer, CollectionDetailSerializer
-from panoscan.serializers import DecorListSerializer, DecorDetailSerializer
-from panoscan.serializers import FinalProductSerializer
-from panoscan.serializers import StructuresForDecorSerializer
-from panoscan.serializers import DecorsForCollectionListSerializer, DecorsForCollectionDetailSerializer
-
-from panoscan.permissions import IsAdminAuthenticated, IsStaffAuthenticated
+from .models import Market, Producer, ProductType, Structure, Collection, Decor, FinalProduct, StructuresForDecor, DecorsForCollection, PhotoTraining, PhotoUser
+from .serializers import MarketListSerializer, MarketDetailSerializer
+from .serializers import ProducerListSerializer,ProducerDetailSerializer
+from .serializers import ProductTypeListSerializer,ProductTypeDetailSerializer
+from .serializers import StructureListSerializer, StructureDetailSerializer
+from .serializers import CollectionListSerializer, CollectionDetailSerializer
+from .serializers import DecorListSerializer, DecorDetailSerializer
+from .serializers import FinalProductSerializer
+from .serializers import StructuresForDecorSerializer
+from .serializers import DecorsForCollectionListSerializer, DecorsForCollectionDetailSerializer
+from .serializers import PhotoUserSerializer
+from .permissions import IsAdminAuthenticated, IsStaffAuthenticated
 
 
 @login_required
@@ -200,4 +202,11 @@ class AdminFinalProductViewset(ModelViewSet):
     queryset = FinalProduct.objects.all()
 
     
-
+@api_view(['POST'])
+def upload_image(request):
+    if 'file' in request.FILES:
+        image = PhotoUser(image=request.FILES['file'])
+        image.save()
+        serializer = PhotoUserSerializer(image)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response({'error': 'File not uploaded'}, status=status.HTTP_400_BAD_REQUEST)

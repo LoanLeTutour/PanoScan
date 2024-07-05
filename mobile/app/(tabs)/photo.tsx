@@ -10,6 +10,7 @@ import { CameraView, useCameraPermissions, CameraType, FlashMode } from "expo-ca
 import { Ionicons } from "@expo/vector-icons";
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
+import axios from "axios";
 
 import styles from "../(tabs)styles/photo.styles";
 
@@ -21,14 +22,6 @@ const ensureDirExists = async () => {
     await FileSystem.makeDirectoryAsync(imgDir, {intermediates: true});
   }
 };
-const imagePickerOptions : ImagePicker.ImagePickerOptions = {
-  mediaTypes: ImagePicker.MediaTypeOptions.Images,
-  allowsEditing: true,
-  aspect: [9, 16],
-  quality: 0.75,
-}
-
-
 
 const Page = () => {
   const [permission, requestPermission] = useCameraPermissions();
@@ -46,7 +39,7 @@ const Page = () => {
   if (!permission.granted) {
     // Camera permissions are not granted yet.
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, {justifyContent:'center'}]}>
         <Text style={{ textAlign: 'center'}}>Une permission d'accès à la caméra est requise</Text>
         <Button onPress={requestPermission} title="donner la permission" />
       </View>
@@ -80,8 +73,12 @@ const Page = () => {
     }
   }
   
-
-
+  const imagePickerOptions : ImagePicker.ImagePickerOptions = {
+    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    allowsEditing: true,
+    aspect: [9, 16],
+    quality: 0.75,
+  }
 
   const selectImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync(imagePickerOptions);
@@ -103,11 +100,17 @@ const Page = () => {
     if (cameraRef.current) {
       try {
         let photo = await cameraRef.current.takePictureAsync();
-        console.log(photo);
-        setImage(photo.uri);
+        if (photo) {
+          console.log(photo);
+          saveImage(photo.uri);
+        }
+        
       } catch (err) {
         console.log(err, "capturing image");
       }
+    }
+    else {
+      console.log("Camera reference is not valid.");
     }
   };
 
@@ -156,7 +159,6 @@ const Page = () => {
         facing={facing}
         flash={flashMode}
         ref={cameraRef}
-        onCameraReady={displayTakePictureButton}
       >
         <View style={styles.buttonsContainer}>
           <View style={styles.topButtonsContainer}>
@@ -183,8 +185,28 @@ const Page = () => {
     );
   };
 
-  const sendToBackend = () => {};
 
+  const sendToBackend = async () => {
+    if (image) {
+      const formData = new FormData();
+      formData.append('file', {
+        uri: image.uri,
+        name: 'photo.jpg',
+        type: 'image/jpeg',
+      });
+
+      try {
+        const response = await axios.post('http', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        console.log('Response:', response.data);
+      } catch (error) {
+        console.error('Error uploading image:', error);
+      }
+    }
+  };
   return (
     <View style={styles.container}>
       {!image ? displayCamera() : displayTakenImage(image)}

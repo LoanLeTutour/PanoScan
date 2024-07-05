@@ -126,3 +126,8 @@ class FinalProductSerializer(ModelSerializer):
     class Meta:
         model = FinalProduct
         fields = ['id', 'decor_collection_structure', 'product_type']
+
+class PhotoUserSerializer(ModelSerializer):
+    class Meta:
+        model: PhotoUser
+        fields = ['id', 'photo', 'date_tested', 'user', 'result', 'active']

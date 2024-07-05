@@ -114,7 +114,7 @@ class PhotoTraining(models.Model):
     active = models.BooleanField(default=True)
 
 class PhotoUser(models.Model):
-    photo = models.ImageField()
+    photo = models.ImageField(upload_to='photos/')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='photos_user')
     date_tested = models.DateTimeField(auto_now_add=True)
     result = models.JSONField(blank=True, default=dict)

@@ -44,6 +44,15 @@ router.register('admin/structures_per_decor', AdminStructuresForDecorViewset, ba
 router.register('admin/final_product', AdminFinalProductViewset, basename='admin-final_product')
 
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+
+@method_decorator(csrf_exempt, name='dispatch')
+def token(request):
+    if request.method == 'POST':
+        # Parsez les données et ajoutez la logique d'authentification ici
+        return JsonResponse({'token': 'your_generated_token'})
 
 urlpatterns = [
     path('admin/', admin.site.urls),

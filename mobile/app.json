@@ -13,13 +13,19 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tign4s.mobile"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.tign4s.mobile"
     },
     "web": {
       "bundler": "metro",
@@ -28,12 +34,13 @@
     },
     "plugins": [
       "expo-router",
-          "expo-camera",
-          {
-            "cameraPermission": "Autorisez $(PRODUCT_NAME) à accéder à la caméra"
-          }
-        
-      
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Autorisez $(PRODUCT_NAME) à accéder à la caméra"
+        }
+      ],
+      "expo-video"
     ],
     "experiments": {
       "typedRoutes": true

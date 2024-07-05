@@ -1,5 +1,5 @@
 import { useState} from "react";
-import { View, Text,TextInput, TouchableOpacity } from "react-native";
+import { View, Text,TextInput, TouchableOpacity} from "react-native";
 import { useRouter} from "expo-router";
 import authService from '../authService';
 
@@ -37,12 +37,17 @@ const LogInScreen: React.FC = () => {
 
   const handleLogin = async () => {
     try {
+      console.log('entrée')
       await authService.login(email, password);
-      router.replace('(tabs)'); // Navigation vers l'écran d'accueil après connexion réussie
+      console.log('login done')
+      router.replace('(tabs)/photo'); // Navigation vers l'écran d'accueil après connexion réussie
     } catch (error) {
       setErrorMessage('Invalid email or password');
+      console.log(error)
     }
   };
+
+  
 
   return (
     <View style={styles.container}>
@@ -52,6 +57,7 @@ const LogInScreen: React.FC = () => {
         <View style={styles.inputArea}>
           <TextInput
             autoCapitalize="none"
+            inputMode="email"
             keyboardType="email-address"
             style={styles.inputField}
             placeholder={mailPlaceholder}
