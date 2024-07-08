@@ -13,6 +13,7 @@ import * as ImagePicker from 'expo-image-picker';
 import axios from "axios";
 
 import styles from "../(tabs)styles/photo.styles";
+import { useAuth } from "../context/AuthContext";
 
 const imgDir = FileSystem.documentDirectory + 'images/';
 
@@ -23,7 +24,8 @@ const ensureDirExists = async () => {
   }
 };
 
-const Page = () => {
+const HomePage: React.FC = () => {
+  const {isAuthenticated, user, logout} = useAuth()
   const [permission, requestPermission] = useCameraPermissions();
   const [image, setImage] = useState<string>("");
 
@@ -214,4 +216,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default HomePage;

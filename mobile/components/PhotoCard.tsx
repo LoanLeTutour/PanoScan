@@ -2,7 +2,7 @@ import { TouchableOpacity, View, Text, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import styles from "./PhotoCard.styles";
-import Colors from "@/constants/Colors";
+import {Colors} from "../constants/Colors";
 
 const PhotoCard = () => {
     const date = new Date('20/10/2024');

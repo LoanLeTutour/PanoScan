@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import authService from '../authService';
+import authService from '../services/authService';
 
 interface AuthContextData {
   isAuthenticated: boolean;
   user: any;
-  login: (username: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -14,8 +14,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<any>(null);
 
-  const login = async (username: string, password: string) => {
-    const user = await authService.login(username, password);
+  const login = async (email: string, password: string) => {
+    const user = await authService.login(email, password);
     setUser(user);
     setIsAuthenticated(true);
   };
@@ -33,7 +33,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   );
 };
 
-export const useAuth = () => {
+export const useAuth = (): AuthContextData => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');

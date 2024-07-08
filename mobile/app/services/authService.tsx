@@ -8,7 +8,7 @@ interface AuthResponse {
   refresh: string;
 }
 
-const login = async (email: string, password: string): Promise<AuthResponse> => {
+const login = async (email: string, password: string): Promise<any> => {
   try{
   console.log('login entrée')
   console.log('Sending request to:', API_URL + 'token/');
