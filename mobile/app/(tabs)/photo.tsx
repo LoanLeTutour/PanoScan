@@ -11,9 +11,13 @@ import { Ionicons } from "@expo/vector-icons";
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 import styles from "../(tabs)styles/photo.styles";
 import { useAuth } from "../context/AuthContext";
+import { backend_url } from "@/constants/backend_url";
+
 
 const imgDir = FileSystem.documentDirectory + 'images/';
 
@@ -61,7 +65,7 @@ const HomePage: React.FC = () => {
     if (flashMode === 'off') {
       return(<Ionicons
         name="flash-off"
-        color="white"
+        color="grey"
         size={30}
         style={styles.icons}
       />)
@@ -137,7 +141,7 @@ const HomePage: React.FC = () => {
         <View style={styles.buttonsResultContainer}>
           <TouchableOpacity
             style={styles.buttonTakenImage}
-            onPress={sendToBackend}
+            onPress={uploadPhoto}
           >
             <Text style={styles.textResult}>Tester</Text>
             <Ionicons name="search" color="white" size={30} />
@@ -186,34 +190,109 @@ const HomePage: React.FC = () => {
       </CameraView>
     );
   };
+  const refreshAccessToken = async () => {
+    try {
+        const refreshToken = await AsyncStorage.getItem('refreshToken');
+        console.log(refreshToken)
+        if (!refreshToken) {
+            throw new Error('No refresh token found');
+        }
 
-
-  const sendToBackend = async () => {
-    if (image) {
-      const formData = new FormData();
-      formData.append('file', {
-        uri: image.uri,
-        name: 'photo.jpg',
-        type: 'image/jpeg',
-      });
-
-      try {
-        const response = await axios.post('http', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+        const response = await axios.post(`${backend_url()}token/refresh/`, {
+            refresh: refreshToken,
         });
-        console.log('Response:', response.data);
-      } catch (error) {
-        console.error('Error uploading image:', error);
-      }
+
+        const { access, refresh } = response.data;
+        await AsyncStorage.setItem('accessToken', access);
+        await AsyncStorage.setItem('refreshToken', refresh);
+        return access;
+    } catch (error) {
+        console.error('Failed to refresh token', error);
+        throw error;
     }
-  };
+};
+
+
+const uploadPhoto = async () => {
+  try {
+      let accessToken = await AsyncStorage.getItem('accessToken');
+      if (!accessToken) {
+          accessToken = await refreshAccessToken();
+      }
+
+      const response = await FileSystem.uploadAsync(
+          `${backend_url()}upload/`,
+          image,
+          {
+              httpMethod: "POST",
+              uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+              fieldName: "photo",
+              headers: {
+                  "Authorization": `Bearer ${accessToken}`,
+              },
+          }
+      );
+
+      if (response.status !== 201) {
+          console.log("Failed to upload image!");
+          const newAccessToken = await refreshAccessToken();
+              // Réessayez l'upload avec le nouveau token
+              await FileSystem.uploadAsync(
+                  `${backend_url()}upload/`,
+                  image,
+                  {
+                      httpMethod: "POST",
+                      uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+                      fieldName: "photo",
+                      headers: {
+                          "Authorization": `Bearer ${newAccessToken}`,
+                      },
+                  }
+              );
+      } else {
+          console.log('Image uploaded successfully:', response.body);
+      }
+  } catch (error:any) {
+      if (error.response && error.response.status === 401) {
+          // Token expiré, essayez de le rafraîchir
+          try {
+              const newAccessToken = await refreshAccessToken();
+              // Réessayez l'upload avec le nouveau token
+              const retryResponse = await FileSystem.uploadAsync(
+                  `${backend_url()}upload/`,
+                  image,
+                  {
+                      httpMethod: "POST",
+                      uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+                      fieldName: "photo",
+                      headers: {
+                          "Authorization": `Bearer ${newAccessToken}`,
+                      },
+                  }
+              );
+
+              if (retryResponse.status !== 201) {
+                  throw new Error("Failed to upload image on retry!");
+              } else {
+                  console.log('Image uploaded successfully on retry:', retryResponse.body);
+              }
+          } catch (retryError: any) {
+              console.error('Retry failed', retryError);
+
+          }
+      } else {
+          console.error(error);
+
+      }
+  }
+};
+
+
   return (
     <View style={styles.container}>
       {!image ? displayCamera() : displayTakenImage(image)}
     </View>
   );
-};
 
+}
 export default HomePage;

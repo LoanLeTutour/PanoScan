@@ -22,6 +22,7 @@ import panoscan.views
 from panoscan.views import DecorViewset, MarketViewset,StructureViewset, ProducerViewset, ProductTypeViewset, CollectionViewset, DecorsForCollectionViewset, StructuresForDecorViewset, FinalProductViewset
 from panoscan.views import AdminDecorViewset, AdminMarketViewset, AdminStructureViewset, AdminProducerViewset, AdminProductTypeViewset, AdminCollectionViewset, AdminDecorsForCollectionViewset, AdminStructuresForDecorViewset, AdminFinalProductViewset
 from rest_framework import routers
+from panoscan.views import PhotoUploadView
 
 router = routers.SimpleRouter()
 router.register('decor', DecorViewset, basename='decor')
@@ -54,6 +55,9 @@ def token(request):
         # Parsez les données et ajoutez la logique d'authentification ici
         return JsonResponse({'token': 'your_generated_token'})
 
+from django.conf import settings
+from django.conf.urls.static import static
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', LoginView.as_view(template_name='authentication/login.html',redirect_authenticated_user=True),name='login'),
@@ -62,5 +66,6 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/', include(router.urls))
-]
+    path('api/', include(router.urls)),
+    path('api/upload/', PhotoUploadView.as_view(), name='photo-upload')
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -113,12 +113,15 @@ class PhotoTraining(models.Model):
     decor = models.ForeignKey(Decor, on_delete=models.CASCADE, related_name='photos_training')
     active = models.BooleanField(default=True)
 
+from authentication.models import User
 class PhotoUser(models.Model):
     photo = models.ImageField(upload_to='photos/')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='photos_user')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='photos_user')
     date_tested = models.DateTimeField(auto_now_add=True)
     result = models.JSONField(blank=True, default=dict)
     active = models.BooleanField(default=True)
+    def __str__(self):
+        return f"PhotoUser id: {self.id}, User: {self.user.email}"
 
 class DecorsForCollection(models.Model):
     decor = models.ForeignKey(Decor, on_delete=models.CASCADE, related_name='decor_collections')

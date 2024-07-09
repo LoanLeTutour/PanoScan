@@ -25,7 +25,8 @@ SECRET_KEY = 'django-insecure-r_yb6uahih!6h^*j+7gp5m1s2^*yz)%fg)5mau(_g7k37ut1a@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
 
 
 # Application definition
@@ -56,6 +57,10 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    'exp://192.168.1.36:8081',
+    'http://localhost:8081'
+]
 ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
@@ -129,6 +134,84 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+DATABASE_ROUTERS = []
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 2621440
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
+DATA_UPLOAD_MAX_NUMBER_FILES = 100
+
+DATETIME_FORMAT = 'N j, Y, P'
+DATETIME_INPUT_FORMATS = [
+    '%Y-%m-%d %H:%M:%S',
+    '%Y-%m-%d %H:%M:%S.%f',
+    '%Y-%m-%d %H:%M',
+    '%m/%d/%Y %H:%M:%S',
+    '%m/%d/%Y %H:%M:%S.%f',
+    '%m/%d/%Y %H:%M',
+    '%m/%d/%y %H:%M:%S',
+    '%m/%d/%y %H:%M:%S.%f',
+    '%m/%d/%y %H:%M',
+]
+
+DATE_FORMAT = 'N j, Y'
+DATE_INPUT_FORMATS = [
+    '%Y-%m-%d',
+    '%m/%d/%Y',
+    '%m/%d/%y',
+    '%b %d %Y',
+    '%b %d, %Y',
+    '%d %b %Y',
+    '%d %b, %Y',
+    '%B %d %Y',
+    '%B %d, %Y',
+    '%d %B %Y',
+    '%d %B, %Y',
+]
+
+DEBUG = True
+DEBUG_PROPAGATE_EXCEPTIONS = False
+DECIMAL_SEPARATOR = '.'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_CHARSET = 'utf-8'
+DEFAULT_EXCEPTION_REPORTER = 'django.views.debug.ExceptionReporter'
+DEFAULT_EXCEPTION_REPORTER_FILTER = 'django.views.debug.SafeExceptionReporterFilter'
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DEFAULT_FROM_EMAIL = 'webmaster@localhost'
+DEFAULT_INDEX_TABLESPACE = ''
+DEFAULT_TABLESPACE = ''
+DISALLOWED_USER_AGENTS = []
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'localhost'
+EMAIL_HOST_PASSWORD = '********************'
+EMAIL_HOST_USER = ''
+EMAIL_PORT = 25
+EMAIL_SSL_CERTFILE = None
+EMAIL_SSL_KEYFILE = '********************'
+EMAIL_SUBJECT_PREFIX = '[Django] '
+EMAIL_TIMEOUT = None
+EMAIL_USE_LOCALTIME = False
+EMAIL_USE_SSL = False
+EMAIL_USE_TLS = False
+
+FILE_UPLOAD_DIRECTORY_PERMISSIONS = None
+FILE_UPLOAD_HANDLERS = [
+    'django.core.files.uploadhandler.MemoryFileUploadHandler',
+    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+]
+FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440
+FILE_UPLOAD_PERMISSIONS = 420
+FILE_UPLOAD_TEMP_DIR = None
+
+FIRST_DAY_OF_WEEK = 0
+FIXTURE_DIRS = []
+FORCE_SCRIPT_NAME = None
+FORMAT_MODULE_PATH = None
+FORMS_URLFIELD_ASSUME_HTTPS = False
+FORM_RENDERER = 'django.forms.renderers.DjangoTemplates'
+IGNORABLE_404_URLS = []
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework_simplejwt.authentication.JWTAuthentication',),
@@ -143,8 +226,9 @@ from datetime import timedelta
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'ROTATE_REFRESH_TOKENS': False,
+    'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': False,
     'ALGORITHM': 'HS256',
     'SIGNING_KEY': 'your-secret-key',
     'VERIFYING_KEY': None,

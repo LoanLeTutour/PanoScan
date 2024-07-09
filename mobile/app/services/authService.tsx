@@ -1,7 +1,6 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const API_URL = 'http://127.0.0.1:8000/api/';
+import { backend_url } from '@/constants/backend_url';
 
 interface AuthResponse {
   access: string;
@@ -11,8 +10,10 @@ interface AuthResponse {
 const login = async (email: string, password: string): Promise<any> => {
   try{
   console.log('login entrée')
-  console.log('Sending request to:', API_URL + 'token/');
-  const response = await axios.post<AuthResponse>(API_URL + 'token/', {
+  const baseUrl = backend_url()
+  const loginUrl = `${baseUrl}token/`
+  console.log('Sending request to:', loginUrl);
+  const response = await axios.post<AuthResponse>(loginUrl, {
     email,
     password,
   });
@@ -24,7 +25,7 @@ const login = async (email: string, password: string): Promise<any> => {
   return response.data;
 } catch(err) {
   if (axios.isAxiosError(err)) {
-    console.log('Axios error details:', err);
+    console.log('Axios error details:', err.toJSON());
     console.log('Error response:', err.response);
     console.log('Error request:', err.request);
     console.log('Error message:', err.message);
@@ -36,7 +37,7 @@ const login = async (email: string, password: string): Promise<any> => {
 const refreshToken = async (): Promise<string> => {
   const refreshToken = await AsyncStorage.getItem('refreshToken');
   if (refreshToken) {
-    const response = await axios.post<{ access: string }>(API_URL + 'token/refresh/', {
+    const response = await axios.post<{ access: string }>(backend_url() + 'token/refresh/', {
       refresh: refreshToken,
     });
     if (response.data.access) {
