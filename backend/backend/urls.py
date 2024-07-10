@@ -19,8 +19,8 @@ from django.contrib import admin
 from django.urls import include, path
 from django.contrib.auth.views import LoginView, LogoutView
 import panoscan.views
-from panoscan.views import DecorViewset, MarketViewset,StructureViewset, ProducerViewset, ProductTypeViewset, CollectionViewset, DecorsForCollectionViewset, StructuresForDecorViewset, FinalProductViewset
-from panoscan.views import AdminDecorViewset, AdminMarketViewset, AdminStructureViewset, AdminProducerViewset, AdminProductTypeViewset, AdminCollectionViewset, AdminDecorsForCollectionViewset, AdminStructuresForDecorViewset, AdminFinalProductViewset
+from panoscan.views import DecorViewset, MarketViewset,StructureViewset, ProducerViewset,FormatProductViewset, ProductTypeViewset, CollectionViewset, DecorsForCollectionViewset, StructuresForDecorViewset, FinalProductViewset
+from panoscan.views import AdminDecorViewset, AdminMarketViewset, AdminStructureViewset, AdminProducerViewset,AdminFormatProductViewset, AdminProductTypeViewset, AdminCollectionViewset, AdminDecorsForCollectionViewset, AdminStructuresForDecorViewset, AdminFinalProductViewset
 from rest_framework import routers
 from panoscan.views import PhotoUploadView
 
@@ -28,6 +28,7 @@ router = routers.SimpleRouter()
 router.register('decor', DecorViewset, basename='decor')
 router.register('market', MarketViewset, basename='market')
 router.register('producer', ProducerViewset, basename='producer')
+router.register('format_product', FormatProductViewset, basename='format_product')
 router.register('structure', StructureViewset, basename='structure')
 router.register('product_type', ProductTypeViewset, basename='product_type')
 router.register('collection', CollectionViewset, basename='collection')
@@ -37,6 +38,7 @@ router.register('final_product', FinalProductViewset, basename='final_product')
 router.register('admin/decor', AdminDecorViewset, basename='admin-decor')
 router.register('admin/market', AdminMarketViewset, basename='admin-market')
 router.register('admin/producer', AdminProducerViewset, basename='admin-producer')
+router.register('admin/format_product', AdminFormatProductViewset, basename='admin-format_product')
 router.register('admin/structure', AdminStructureViewset, basename='admin-structure')
 router.register('admin/product_type', AdminProductTypeViewset, basename='admin-product_type')
 router.register('admin/collection', AdminCollectionViewset, basename='admin-collection')

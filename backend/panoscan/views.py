@@ -6,9 +6,10 @@ from rest_framework.decorators import action
 from rest_framework import status
 from rest_framework.decorators import api_view
 
-from .models import Market, Producer, ProductType, Structure, Collection, Decor, FinalProduct, StructuresForDecor, DecorsForCollection, PhotoTraining, PhotoUser
+from .models import Market, Producer,FormatProduct, ProductType, Structure, Collection, Decor, FinalProduct, StructuresForDecor, DecorsForCollection, PhotoTraining, PhotoUser
 from .serializers import MarketListSerializer, MarketDetailSerializer
 from .serializers import ProducerListSerializer,ProducerDetailSerializer
+from .serializers import FormatProductListSerializer, FormatProductDetailSerializer
 from .serializers import ProductTypeListSerializer,ProductTypeDetailSerializer
 from .serializers import StructureListSerializer, StructureDetailSerializer
 from .serializers import CollectionListSerializer, CollectionDetailSerializer
@@ -17,6 +18,7 @@ from .serializers import FinalProductSerializer
 from .serializers import StructuresForDecorSerializer
 from .serializers import DecorsForCollectionListSerializer, DecorsForCollectionDetailSerializer
 from .serializers import PhotoUserSerializer
+
 from .permissions import IsAdminAuthenticated, IsStaffAuthenticated, IsAuthenticated
 
 
@@ -84,6 +86,23 @@ class AdminProducerViewset(MultipleSerializerMixin, ModelViewSet):
     detail_serializer_class = ProducerDetailSerializer
     permission_classes = [IsAdminAuthenticated, IsStaffAuthenticated]
     queryset = Producer.objects.all()
+
+
+class FormatProductViewset(MultipleSerializerMixin, ReadOnlyModelViewSet):
+    serializer_class = FormatProductListSerializer
+    detail_serializer_class = FormatProductDetailSerializer
+    def get_queryset(self):
+        return FormatProduct.objects.filter(active=True)
+    @action(detail=True, methods=['post'])
+    def disable(self, request, pk):
+        self.get_object().disable()
+        return Response()
+
+class AdminFormatProductViewset(MultipleSerializerMixin, ModelViewSet):
+    serializer_class = FormatProductListSerializer
+    detail_serializer_class = FormatProductDetailSerializer
+    permission_classes = [IsAdminAuthenticated, IsStaffAuthenticated]
+    queryset = FormatProduct.objects.all()
 
 class ProductTypeViewset(MultipleSerializerMixin, ReadOnlyModelViewSet):
     serializer_class = ProductTypeListSerializer

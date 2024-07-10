@@ -1,5 +1,5 @@
 from django.contrib import admin
-from panoscan.models import Market, Producer, ProductType, Structure, Collection, Decor, FinalProduct, StructuresForDecor, DecorsForCollection, PhotoTraining, PhotoUser
+from panoscan.models import Market, Producer, ProductType,FormatProduct, Structure, Collection, Decor, FinalProduct, StructuresForDecor, DecorsForCollection, PhotoTraining, PhotoUser
 
 
 admin.site.register(Market)
@@ -13,3 +13,4 @@ admin.site.register(StructuresForDecor)
 admin.site.register(DecorsForCollection)
 admin.site.register(PhotoTraining)
 admin.site.register(PhotoUser)
+admin.site.register(FormatProduct)

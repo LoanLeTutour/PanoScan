@@ -1,6 +1,6 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, ValidationError
 
-from panoscan.models import Market, Producer, ProductType, Structure, Collection, Decor, FinalProduct, StructuresForDecor, DecorsForCollection, PhotoTraining, PhotoUser
+from panoscan.models import Market, Producer, ProductType,FormatProduct, Structure, Collection, Decor, FinalProduct, StructuresForDecor, DecorsForCollection, PhotoTraining, PhotoUser
 
 
 # Market serializers
@@ -45,6 +45,17 @@ class StructureListSerializer(ModelSerializer):
     class Meta:
         model = Structure
         fields = ['code', 'producer']
+# FormatProduct serializers
+
+class FormatProductDetailSerializer(ModelSerializer):
+    class Meta:
+        model = FormatProduct
+        fields = ['id', 'length_in_mm', 'width_in_mm']
+
+class FormatProductListSerializer(ModelSerializer):
+    class Meta:
+        model = FormatProduct
+        fields = ['length_in_mm', 'width_in_mm']
 
 # ProductType serializers
 class ProductTypeDetailSerializer(ModelSerializer):

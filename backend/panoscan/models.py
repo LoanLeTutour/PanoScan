@@ -33,16 +33,29 @@ class Producer(models.Model):
         self.structures.update(active=False)
         self.decors.update(active=False)
 
+class FormatProduct(models.Model):
+    length_in_mm = models.IntegerField()
+    width_in_mm = models.IntegerField()
+    active = models.BooleanField(default=True)
+    def __str__(self) -> str:
+        return f'{self.length_in_mm}x{self.width_in_mm}'
+    @transaction.atomic
+    def disable(self):
+        if self.active is False:
+            return
+        self.active = False
+        self.save()
+        self.product_types.update(active=False)
+    
 class ProductType(models.Model):
     name = models.CharField(max_length=100)
     active = models.BooleanField(default=True)
-    length_in_mm = models.IntegerField()
-    width_in_mm = models.IntegerField()
+    format = models.ForeignKey(FormatProduct, on_delete=models.CASCADE, related_name='product_types', blank=True, null=True )
     thickness_in_mm = models.FloatField()
     producer = models.ForeignKey(Producer, on_delete=models.CASCADE, related_name='product_types')
     
     def __str__(self) -> str:
-        return f'{self.name} - {self.producer} - {self.length_in_mm}x{self.width_in_mm}x{self.thickness_in_mm}' 
+        return f'{self.name} - {self.producer} - {self.format.length_in_mm}x{self.format.width_in_mm}x{self.thickness_in_mm}' 
     
     @transaction.atomic
     def disable(self):
