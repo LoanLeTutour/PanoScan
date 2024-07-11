@@ -247,9 +247,19 @@ class PhotoUploadView(APIView):
 
     def post(self, request, *args, **kwargs):
         print("Headers: ", request.headers)
-        serializer = PhotoUserSerializer(data=request.data)
+        data = request.data
+        data['user'] = request.user.id
+        if 'photo' not in request.FILES:
+            return Response({'error': 'No file provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+        photo = request.FILES['photo']
+        # Vérifiez que le fichier a un nom
+        if not photo.name:
+            return Response({'error': 'File must have a name'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = PhotoUserSerializer(data=data)
         if serializer.is_valid():
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
+            print(serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

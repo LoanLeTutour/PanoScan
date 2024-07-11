@@ -4,7 +4,8 @@ import { useRouter} from "expo-router";
 import { useAuth } from "../context/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import styles from "./index.styles";
-
+import axios from "axios";
+import { backend_url } from "@/constants/backend_url";
 const LogInScreen: React.FC = () => {
   const router = useRouter();
 
@@ -17,16 +18,26 @@ const LogInScreen: React.FC = () => {
 
   const checkLoggedIn = async (key: string) => {
     try {
-    const value = await AsyncStorage.getItem(key);
-    if (value){
-      router.replace("(tabs)/photo")
+    const refreshToken = await AsyncStorage.getItem(key);
+    if (!refreshToken) {
+      return
     }
-    } catch(error){
+    const response = await axios.post(`${backend_url()}token/refresh/`, {
+      refresh: refreshToken,
+    });
+    const { access, refresh } = response.data;
+    await AsyncStorage.setItem('accessToken', access);
+    await AsyncStorage.setItem('refreshToken', refresh);
+    router.replace('(tabs)/photo')
+    } catch(error:any){
       console.log('key existence checking error', error)
+      if (error.response && error.response.status === 401){
+        return;
+      }
     }
   };
   useEffect(() => {
-    checkLoggedIn('accessToken')
+    checkLoggedIn('refreshToken')
   }, []);
   
   const checkInputs = () => {
@@ -53,7 +64,8 @@ const LogInScreen: React.FC = () => {
   const handleLogin = async () => {
     try {
       await login(email, password);
-      checkLoggedIn('accessToken') // Navigation vers l'écran d'accueil après connexion réussie
+      router.dismissAll()
+      router.replace("(tabs)/photo");
     } catch (error) {
       setErrorMessage('Invalid email or password');
       console.log(error)

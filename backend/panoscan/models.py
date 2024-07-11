@@ -134,7 +134,7 @@ class PhotoUser(models.Model):
     result = models.JSONField(blank=True, default=dict)
     active = models.BooleanField(default=True)
     def __str__(self):
-        return f"PhotoUser id: {self.id}, User: {self.user.email}"
+        return f"Photo_id: {self.id}, User: {self.user.email}"
 
 class DecorsForCollection(models.Model):
     decor = models.ForeignKey(Decor, on_delete=models.CASCADE, related_name='decor_collections')

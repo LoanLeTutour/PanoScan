@@ -15,8 +15,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 import styles from "../(tabs)styles/photo.styles";
-import { useAuth } from "../context/AuthContext";
 import { backend_url } from "@/constants/backend_url";
+import { useRouter } from "expo-router";
 
 
 const imgDir = FileSystem.documentDirectory + 'images/';
@@ -29,13 +29,12 @@ const ensureDirExists = async () => {
 };
 
 const HomePage: React.FC = () => {
-  const {isAuthenticated, user, logout} = useAuth()
   const [permission, requestPermission] = useCameraPermissions();
   const [image, setImage] = useState<string>("");
-
   const [facing, setFacing] = useState<CameraType>('back');
   const [flashMode, setflashMode] = useState<FlashMode>('off');
   const cameraRef = useRef<CameraView>(null);
+  const router = useRouter()
 
   if (!permission) {
     // Camera permissions are still loading.
@@ -190,6 +189,7 @@ const HomePage: React.FC = () => {
       </CameraView>
     );
   };
+  
   const refreshAccessToken = async () => {
     try {
         const refreshToken = await AsyncStorage.getItem('refreshToken');
@@ -197,18 +197,19 @@ const HomePage: React.FC = () => {
         if (!refreshToken) {
             throw new Error('No refresh token found');
         }
-
         const response = await axios.post(`${backend_url()}token/refresh/`, {
             refresh: refreshToken,
         });
-
         const { access, refresh } = response.data;
         await AsyncStorage.setItem('accessToken', access);
         await AsyncStorage.setItem('refreshToken', refresh);
         return access;
-    } catch (error) {
+    } catch (error:any) {
         console.error('Failed to refresh token', error);
-        throw error;
+        if (error.response && error.response.status === 401){
+          console.log('refresh token expired')
+          router.replace('(auth)/index')
+        }
     }
 };
 
