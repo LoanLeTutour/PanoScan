@@ -4,8 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import styles from "./PhotoCard.styles";
 import {Colors} from "../constants/Colors";
 
-const PhotoCard = () => {
-    const date = new Date('20/10/2024');
+const PhotoCard = ({item,index}) => {
     return (
         <View style={styles.container}>
             <View style={styles.overview}>
@@ -13,11 +12,11 @@ const PhotoCard = () => {
                 <Image 
                 resizeMode="cover"
                 style={styles.image}
-                source={require('../assets/images/icon.png')}
+                source={{uri: item.photo_url}}
                 />
             </View>
             <View style={styles.infoContainer}>
-                <Text style={styles.text}>18 Janvier 2024  </Text>
+                <Text style={styles.text}>item.date_tested  </Text>
                 <View style={styles.idemContainer}>
                 <Text style={styles.text}>SwissKrono</Text>
                 <Text style={styles.text}>K-101-PE</Text>

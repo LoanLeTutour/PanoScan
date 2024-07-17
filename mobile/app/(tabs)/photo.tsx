@@ -19,7 +19,7 @@ import { backend_url } from "@/constants/backend_url";
 import { useRouter } from "expo-router";
 
 
-const imgDir = FileSystem.documentDirectory + 'images/';
+const imgDir = FileSystem.documentDirectory + 'photos/';
 
 const ensureDirExists = async () => {
   const dirInfo = await FileSystem.getInfoAsync(imgDir);

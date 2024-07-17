@@ -19,7 +19,7 @@ from django.contrib import admin
 from django.urls import include, path
 from django.contrib.auth.views import LoginView, LogoutView
 import panoscan.views
-from panoscan.views import DecorViewset, MarketViewset,StructureViewset, ProducerViewset,FormatProductViewset, ProductTypeViewset, CollectionViewset, DecorsForCollectionViewset, StructuresForDecorViewset, FinalProductViewset
+from panoscan.views import PhotoUserViewset, DecorViewset, MarketViewset,StructureViewset, ProducerViewset,FormatProductViewset, ProductTypeViewset, CollectionViewset, DecorsForCollectionViewset, StructuresForDecorViewset, FinalProductViewset
 from panoscan.views import AdminDecorViewset, AdminMarketViewset, AdminStructureViewset, AdminProducerViewset,AdminFormatProductViewset, AdminProductTypeViewset, AdminCollectionViewset, AdminDecorsForCollectionViewset, AdminStructuresForDecorViewset, AdminFinalProductViewset
 from rest_framework import routers
 from panoscan.views import PhotoUploadView
@@ -45,7 +45,7 @@ router.register('admin/collection', AdminCollectionViewset, basename='admin-coll
 router.register('admin/decors_per_collection', AdminDecorsForCollectionViewset, basename='admin-decors_per_collection')
 router.register('admin/structures_per_decor', AdminStructuresForDecorViewset, basename='admin-structures_per_decor')
 router.register('admin/final_product', AdminFinalProductViewset, basename='admin-final_product')
-
+router.register('photos', PhotoUserViewset, basename='photos')
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt

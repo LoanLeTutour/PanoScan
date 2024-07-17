@@ -263,3 +263,13 @@ class PhotoUploadView(APIView):
         else:
             print(serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class PhotoUserViewset(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PhotoUserSerializer
+    def get_queryset(self):
+        queryset = PhotoUserSerializer.objects.filter(active=True)
+        user_id = self.request.user.id
+        if user_id:
+            queryset = queryset.filter(user_id=user_id)
+        return queryset
