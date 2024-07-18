@@ -240,7 +240,11 @@ class AdminFinalProductViewset(ModelViewSet):
     permission_classes = [IsAdminAuthenticated, IsStaffAuthenticated]
     queryset = FinalProduct.objects.all()
 
-from rest_framework.parsers import MultiPartParser, FormParser
+
+## Ajout de photos pour l'entrainement du modèle
+
+## Modèle Tensorflow
+
 
 class PhotoUploadView(APIView):
     permission_classes = [IsAuthenticated]

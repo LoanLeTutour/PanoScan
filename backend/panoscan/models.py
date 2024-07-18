@@ -125,12 +125,14 @@ class PhotoTraining(models.Model):
     photo = models.ImageField()
     decor = models.ForeignKey(Decor, on_delete=models.CASCADE, related_name='photos_training')
     active = models.BooleanField(default=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    producer = models.ForeignKey(Producer, on_delete=models.CASCADE, related_name='photos_training', default=True, null=True)
 
 from authentication.models import User
 class PhotoUser(models.Model):
     photo = models.ImageField(upload_to='photos/')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='photos_user')
-    date_tested = models.DateTimeField(auto_now_add=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
     result = models.JSONField(blank=True, default=dict)
     active = models.BooleanField(default=True)
     def __str__(self):
