@@ -141,5 +141,5 @@ class FinalProductSerializer(ModelSerializer):
 class PhotoUserSerializer(ModelSerializer):
     class Meta:
         model = PhotoUser
-        fields = ['id', 'photo', 'date_tested', 'user', 'result', 'active']
-        read_only_fields = ['id', 'date_tested', 'result', 'active']
+        fields = ['id', 'photo', 'uploaded_at', 'user', 'result', 'active']
+        read_only_fields = ['id', 'uploaded_at', 'result', 'active']

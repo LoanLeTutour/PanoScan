@@ -243,9 +243,6 @@ class AdminFinalProductViewset(ModelViewSet):
 
 ## Ajout de photos pour l'entrainement du modèle
 
-## Modèle Tensorflow
-
-
 class PhotoUploadView(APIView):
     permission_classes = [IsAuthenticated]
 
