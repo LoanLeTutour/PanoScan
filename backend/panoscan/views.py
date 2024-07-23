@@ -265,12 +265,28 @@ class PhotoUploadView(APIView):
             print(serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class PhotoUserViewset(ModelViewSet):
-    permission_classes = [IsAuthenticated]
+from rest_framework import generics
+from rest_framework.response import Response
+from rest_framework import status
+from .models import PhotoUser
+from .serializers import PhotoUserSerializer
+
+
+class PhotoUserViewSet(ModelViewSet):
+    @action(detail=True, methods=['get'])
+    def photos(self, request, pk=None):
+        queryset = PhotoUser.objects.filter(user__id=pk)
+        serializer = PhotoUserSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class UserPhotosAPIView(generics.ListAPIView):
     serializer_class = PhotoUserSerializer
+
     def get_queryset(self):
-        queryset = PhotoUserSerializer.objects.filter(active=True)
-        user_id = self.request.user.id
-        if user_id:
-            queryset = queryset.filter(user_id=user_id)
-        return queryset
+        user_id = self.kwargs['user_id']
+        return PhotoUser.objects.filter(user__id=user_id)
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

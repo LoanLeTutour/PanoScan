@@ -19,7 +19,7 @@ from django.contrib import admin
 from django.urls import include, path
 from django.contrib.auth.views import LoginView, LogoutView
 import panoscan.views
-from panoscan.views import PhotoUserViewset, DecorViewset, MarketViewset,StructureViewset, ProducerViewset,FormatProductViewset, ProductTypeViewset, CollectionViewset, DecorsForCollectionViewset, StructuresForDecorViewset, FinalProductViewset
+from panoscan.views import PhotoUserViewSet, DecorViewset, MarketViewset,StructureViewset, ProducerViewset,FormatProductViewset, ProductTypeViewset, CollectionViewset, DecorsForCollectionViewset, StructuresForDecorViewset, FinalProductViewset
 from panoscan.views import AdminDecorViewset, AdminMarketViewset, AdminStructureViewset, AdminProducerViewset,AdminFormatProductViewset, AdminProductTypeViewset, AdminCollectionViewset, AdminDecorsForCollectionViewset, AdminStructuresForDecorViewset, AdminFinalProductViewset
 from rest_framework import routers
 from panoscan.views import PhotoUploadView
@@ -35,6 +35,7 @@ router.register('collection', CollectionViewset, basename='collection')
 router.register('decors_per_collection', DecorsForCollectionViewset, basename='decors_per_collection')
 router.register('structures_per_decor', StructuresForDecorViewset, basename='structures_per_decor')
 router.register('final_product', FinalProductViewset, basename='final_product')
+router.register(r'user', PhotoUserViewSet, basename='user')
 router.register('admin/decor', AdminDecorViewset, basename='admin-decor')
 router.register('admin/market', AdminMarketViewset, basename='admin-market')
 router.register('admin/producer', AdminProducerViewset, basename='admin-producer')
@@ -45,7 +46,7 @@ router.register('admin/collection', AdminCollectionViewset, basename='admin-coll
 router.register('admin/decors_per_collection', AdminDecorsForCollectionViewset, basename='admin-decors_per_collection')
 router.register('admin/structures_per_decor', AdminStructuresForDecorViewset, basename='admin-structures_per_decor')
 router.register('admin/final_product', AdminFinalProductViewset, basename='admin-final_product')
-router.register('photos', PhotoUserViewset, basename='photos')
+
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -69,5 +70,7 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/', include(router.urls)),
-    path('api/upload/', PhotoUploadView.as_view(), name='photo-upload')
+    path('api/upload/', PhotoUploadView.as_view(), name='photo-upload'),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
