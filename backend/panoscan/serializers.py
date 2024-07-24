@@ -143,3 +143,8 @@ class PhotoUserSerializer(ModelSerializer):
         model = PhotoUser
         fields = ['id', 'photo', 'uploaded_at', 'user', 'result', 'active']
         read_only_fields = ['id', 'uploaded_at', 'result', 'active']
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.photo:
+            return request.build_absolute_uri(obj.photo.url)
+        return None

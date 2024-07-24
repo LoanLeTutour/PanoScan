@@ -241,6 +241,7 @@ AUTH_USER_MODEL = 'authentication.User'
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = LOGIN_URL
-
+import os
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'assets/images'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+

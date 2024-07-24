@@ -130,7 +130,7 @@ class PhotoTraining(models.Model):
 
 from authentication.models import User
 class PhotoUser(models.Model):
-    photo = models.ImageField(upload_to='photos/')
+    photo = models.ImageField(upload_to='images/')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='photos_user')
     uploaded_at = models.DateTimeField(auto_now_add=True)
     result = models.JSONField(blank=True, default=dict)
