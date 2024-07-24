@@ -64,8 +64,6 @@ const LogInScreen: React.FC = () => {
   const handleLogin = async () => {
     try {
       await login(email, password);
-      router.dismissAll()
-      router.replace("(tabs)/photo");
     } catch (error) {
       setErrorMessage('Invalid email or password');
       console.log(error)

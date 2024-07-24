@@ -5,6 +5,7 @@ import { backend_url } from '@/constants/backend_url';
 interface AuthResponse {
   access: string;
   refresh: string;
+  user:{id: string, email: string}
 }
 
 const login = async (email: string, password: string): Promise<any> => {
@@ -50,8 +51,12 @@ const refreshToken = async (): Promise<string> => {
 };
 
 const logout = async (): Promise<void> => {
-  await AsyncStorage.removeItem('accessToken');
-  await AsyncStorage.removeItem('refreshToken');
+  try {
+    await AsyncStorage.removeItem('accessToken');
+    await AsyncStorage.removeItem('refreshToken');
+  }catch (e){
+    console.log(e)
+  }
 };
 
 export default {
