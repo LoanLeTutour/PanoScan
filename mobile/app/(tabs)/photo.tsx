@@ -17,6 +17,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import styles from "../(tabs)styles/photo.styles";
 import { backend_url } from "@/constants/backend_url";
 import { useRouter } from "expo-router";
+import { useAuth } from "../context/AuthContext";
+import { usePhotos } from "../context/PhotoContext";
 
 
 const imgDir = FileSystem.documentDirectory + 'photos/';
@@ -29,6 +31,7 @@ const ensureDirExists = async () => {
 };
 
 const HomePage: React.FC = () => {
+  const { addPhoto } = usePhotos();
   const [permission, requestPermission] = useCameraPermissions();
   const [image, setImage] = useState<string>("");
   const [facing, setFacing] = useState<CameraType>('back');
@@ -251,6 +254,8 @@ const uploadPhoto = async () => {
                   }
               );
       } else {
+          const uploadedPhoto = JSON.parse(response.body);
+          addPhoto(uploadedPhoto);
           console.log('Image uploaded successfully:', response.body);
       }
   } catch (error:any) {
@@ -275,6 +280,8 @@ const uploadPhoto = async () => {
               if (retryResponse.status !== 201) {
                   throw new Error("Failed to upload image on retry!");
               } else {
+                  const uploadedPhoto = JSON.parse(retryResponse.body);
+                  addPhoto(uploadedPhoto);
                   console.log('Image uploaded successfully on retry:', retryResponse.body);
               }
           } catch (retryError: any) {
