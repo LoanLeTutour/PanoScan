@@ -3,29 +3,46 @@ import { Ionicons } from "@expo/vector-icons";
 
 import styles from "./PhotoCard.styles";
 import {Colors} from "../constants/Colors";
+import { base_backend_url } from "@/constants/backend_url";
+import { Photo } from "@/app/context/PhotoContext";
 
-const PhotoCard = ({item,index}) => {
+interface PhotoCardProps {
+    item: Photo;
+    index: number;
+  }
+const PhotoCard: React.FC<PhotoCardProps> = ({item, index}) => {
+    const formatting_Date = (date: string) => {
+        const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin','Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+        const year = date.slice(0, 4)
+        const month = Number(date.slice(5, 7))
+        const str_month = months[month - 1]
+        const day = date.slice(8, 10)
+        const hour = date.slice(11,13)
+        const minutes = date.slice(14,16)
+        return `Prise le ${day} ${str_month} ${year} à ${hour}h${minutes}` 
+    }
     return (
         <View style={styles.container}>
             <View style={styles.overview}>
             <View style={styles.imageContainer}>
-                <Image 
+            <Image 
                 resizeMode="cover"
                 style={styles.image}
-                source={{uri: item.photo_url}}
+                source={{uri : `${base_backend_url()}${item.photo}`}}
+                onError={(e) => console.log('Image failed to load', e.nativeEvent.error)}
                 />
             </View>
             <View style={styles.infoContainer}>
-                <Text style={styles.text}>item.date_tested  </Text>
+                <Text style={styles.text}>{formatting_Date(item.uploaded_at)}</Text>
                 <View style={styles.idemContainer}>
-                <Text style={styles.text}>SwissKrono</Text>
-                <Text style={styles.text}>K-101-PE</Text>
-                <Text style={styles.text}>Fiable à 67%</Text>
-                <Image 
-                resizeMode="cover"
-                style={styles.imageInfo}
-                source={require('../assets/images/icon.png')}
-                />
+                    <Text style={styles.text}>Meilleure correspondance :</Text>
+                    <Text style={styles.text}>SwissKrono</Text>
+                    <Text style={styles.text}>K-101-PE</Text>
+                    <Image 
+                    resizeMode="cover"
+                    style={styles.imageInfo}
+                    source={require('../assets/images/icon.png')}
+                    />
                 </View>
             </View>
             </View>
@@ -40,6 +57,8 @@ const PhotoCard = ({item,index}) => {
                 </TouchableOpacity>
             </View>
         </View>
+                
+
     )
 };
 
