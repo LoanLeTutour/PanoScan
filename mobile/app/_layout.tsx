@@ -5,6 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { AuthProvider } from './context/AuthContext';
+import { PhotoProvider } from './context/PhotoContext';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { SafeAreaView } from 'react-native';
@@ -30,11 +31,14 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
+      <PhotoProvider>
       <Stack>
         <Stack.Screen name="(auth)/index" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
+      </PhotoProvider>
+      
     </AuthProvider>
   );
 }
