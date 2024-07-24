@@ -275,7 +275,7 @@ from .serializers import PhotoUserSerializer
 class PhotoUserViewSet(ModelViewSet):
     @action(detail=True, methods=['get'])
     def photos(self, request, pk=None):
-        queryset = PhotoUser.objects.filter(user__id=pk)
+        queryset = PhotoUser.objects.filter(user__id=pk).order_by('-uploaded_at')
         serializer = PhotoUserSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
