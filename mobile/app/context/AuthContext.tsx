@@ -1,56 +1,165 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import authService from '../services/authService';
-import { useRouter } from "expo-router";
-import {jwtDecode} from 'jwt-decode';
-import { useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { backend_url } from '@/constants/backend_url';
+import { useRouter } from 'expo-router';
 
-interface AuthContextData {
-  isAuthenticated: boolean;
-  userId: any;
-  setUserId: React.Dispatch<any>;
-  login: (email: string, password: string) => Promise<void>;
+type AuthResponse = {
+  access: string;
+  refresh: string;
+  user_id: string; 
+};
+
+type AuthContextType = {
+  userId: string | null;
+  accessToken: string | null;
+  refreshToken: string | null;
+  refreshAccessToken: (token: string) => Promise<string | null>;
+  setUser: (userId: string, token: string) => void;
+  login: (email: string, password: string) => Promise<any>;
   logout: () => void;
-}
+};
 
-const AuthContext = createContext<AuthContextData | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [userId, setUserId] = useState<number>();
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [userId, setUserId] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const router = useRouter()
 
-  const login = async (email: string, password: string) => {
-    const user_connection = await authService.login(email, password);
-    const decoded: { user_id: number } = jwtDecode(user_connection.access);
-    console.log(decoded)
-    setUserId(decoded.user_id);
-    setIsAuthenticated(true);
+  useEffect(() => {
+    const loadAuthData = async () => {
+      try{
+        const storedUserId = await AsyncStorage.getItem('userId');
+        const storedAccessToken = await AsyncStorage.getItem('accessToken');
+        const storedRefreshToken = await AsyncStorage.getItem('refreshToken');
+
+        if (storedUserId && storedRefreshToken) {
+          const isTokenValid = await checkTokenValidity(storedRefreshToken);
+          if (isTokenValid) {
+            setUserId(storedUserId);
+            setRefreshToken(storedRefreshToken);
+            if (!storedAccessToken) {
+              const newAccessToken = await refreshAccessToken(storedRefreshToken);
+              if (newAccessToken) {
+                setAccessToken(newAccessToken);
+                router.replace('/(tabs)/photo');
+              } else {
+                logout();
+              }
+            } else {
+              setAccessToken(storedAccessToken);
+              router.replace('/(tabs)/photo');
+            }
+
+          } else {
+            logout()
+          }
+      }
+
+      } catch(error) {
+        console.error('Failed to load authentication data', error);
+      }
+      
+    };
+
+    loadAuthData();
+  }, []);
+
+  const setUser = (userId: string, token: string) => {
+    AsyncStorage.setItem('userId', userId);
+    AsyncStorage.setItem('accessToken', token);
+    setUserId(userId);
+    setAccessToken(token);
   };
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.replace("(tabs)/photo");
-      console.log(userId); // `userId` should now have the correct value
+  const checkTokenValidity = async (token: string): Promise<boolean> => {
+    try {
+      const response = await axios.post(`${backend_url()}token/verify/`, { token });
+      return response.status === 200;
+    } catch (error) {
+      return false;
     }
-  }, [isAuthenticated, userId, router]);
+  };
+
+  const refreshAccessToken = async (token: string): Promise<string | null> => {
+    try {
+      const response = await axios.post(`${backend_url()}token/refresh/`, { refresh: token });
+      if (response.data.access) {
+        await AsyncStorage.setItem('accessToken', response.data.access);
+        setAccessToken(response.data.access);
+        return response.data.access;
+      }
+    } catch (error) {
+      return null;
+    }
+    return null;
+  };
+  
+
+  const login = async (email: string, password: string): Promise<any> => {
+    try {
+      console.log('login entrée');
+      const baseUrl = backend_url();
+      const loginUrl = `${baseUrl}token/`;
+      console.log('Sending request to:', loginUrl);
+      const response = await axios.post<AuthResponse>(loginUrl, {
+        email,
+        password,
+      });
+      console.log('Response:', response.data);
+      if (response.data.access) {
+        await AsyncStorage.setItem('accessToken', response.data.access);
+        await AsyncStorage.setItem('refreshToken', response.data.refresh);
+        setAccessToken(response.data.access);
+        setRefreshToken(response.data.refresh);
+
+        const userId = response.data.user_id;
+      if (userId) {
+        await AsyncStorage.setItem('userId', userId.toString());
+        setUserId(userId.toString());
+      } else {
+        console.error('UserId not found in response');
+      }
+        router.replace('(tabs)/photo'); 
+        // Assuming you have a way to get userId from the response or a subsequent request
+        // setUserId(response.data.userId);
+      }
+      return response.data;
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        console.log('Axios error details:', err.toJSON());
+        console.log('Error response:', err.response);
+        console.log('Error request:', err.request);
+        console.log('Error message:', err.message);
+      } else {
+        console.log('Unexpected error:', err);
+      }
+    }
+  };
 
   const logout = async () => {
-    await authService.logout();
-    setIsAuthenticated(false);
-    setUserId(0);
-    router.replace('(auth)/')
+    setUserId(null);
+    setAccessToken(null);
+    setRefreshToken(null);
+
+    await AsyncStorage.removeItem('userId');
+    await AsyncStorage.removeItem('accessToken');
+    await AsyncStorage.removeItem('refreshToken');
+    router.replace('(auth)/index');
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, userId, setUserId, login, logout }}>
+    <AuthContext.Provider value={{ userId, accessToken, refreshToken, refreshAccessToken,setUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = (): AuthContextData => {
+export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
