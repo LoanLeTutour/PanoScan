@@ -1,7 +1,21 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, ValidationError
-
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from panoscan.models import Market, Producer, ProductType,FormatProduct, Structure, Collection, Decor, FinalProduct, StructuresForDecor, DecorsForCollection, PhotoTraining, PhotoUser
 
+
+# Envoyer l'userId au front end lors de la connexion
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # Ajouter des informations supplémentaires au token
+        token['user_id'] = user.id
+        return token
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        data['user_id'] = self.user.id
+        return data
 
 # Market serializers
 class MarketDetailSerializer(ModelSerializer):

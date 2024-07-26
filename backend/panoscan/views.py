@@ -22,6 +22,12 @@ from .serializers import PhotoUserSerializer
 from .permissions import IsAdminAuthenticated, IsStaffAuthenticated, IsAuthenticated
 
 
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import CustomTokenObtainPairSerializer
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
 @login_required
 def home(request):
     return render(request, 'panoscan/home.html')
