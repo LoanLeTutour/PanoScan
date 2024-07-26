@@ -10,13 +10,10 @@ import { CameraView, useCameraPermissions, CameraType, FlashMode } from "expo-ca
 import { Ionicons } from "@expo/vector-icons";
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
-import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 import styles from "../(tabs)styles/photo.styles";
 import { backend_url } from "@/constants/backend_url";
-import { useRouter } from "expo-router";
 import { useAuth } from "../context/AuthContext";
 import { usePhotos } from "../context/PhotoContext";
 
@@ -31,13 +28,13 @@ const ensureDirExists = async () => {
 };
 
 const HomePage: React.FC = () => {
-  const { addPhoto } = usePhotos();
+  const {userId, accessToken, refreshToken, refreshAccessToken, logout} = useAuth()
+  const { fetchPhotos, loading, error } = usePhotos();
   const [permission, requestPermission] = useCameraPermissions();
   const [image, setImage] = useState<string>("");
   const [facing, setFacing] = useState<CameraType>('back');
   const [flashMode, setflashMode] = useState<FlashMode>('off');
   const cameraRef = useRef<CameraView>(null);
-  const router = useRouter()
 
   if (!permission) {
     // Camera permissions are still loading.
@@ -54,9 +51,12 @@ const HomePage: React.FC = () => {
     );
   }
 
-  const toggleCameraFacing = () => {
+  const atoggleCameraFacing = () => {
     setFacing(current => (current === 'back' ? 'front' : 'back'));
   console.log(facing)}
+
+  const toggleCameraFacing = () => {
+    logout()}
 
   const toggleFlashMode = () => {
     setflashMode(current => (current === 'on' ? 'off' : 'on'));
@@ -91,7 +91,6 @@ const HomePage: React.FC = () => {
   const selectImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync(imagePickerOptions);
     if (!result.canceled) {
-      console.log(result.assets[0].uri);
       saveImage(result.assets[0].uri)
     }
   };
@@ -193,107 +192,56 @@ const HomePage: React.FC = () => {
     );
   };
   
-  const refreshAccessToken = async () => {
+  const uploadPhoto = async () => {
     try {
-        const refreshToken = await AsyncStorage.getItem('refreshToken');
-        console.log(refreshToken)
-        if (!refreshToken) {
-            throw new Error('No refresh token found');
-        }
-        const response = await axios.post(`${backend_url()}token/refresh/`, {
-            refresh: refreshToken,
-        });
-        const { access, refresh } = response.data;
-        await AsyncStorage.setItem('accessToken', access);
-        await AsyncStorage.setItem('refreshToken', refresh);
-        return access;
-    } catch (error:any) {
-        console.error('Failed to refresh token', error);
-        if (error.response && error.response.status === 401){
-          console.log('refresh token expired')
-          router.replace('(auth)/index')
-        }
-    }
-};
-
-
-const uploadPhoto = async () => {
-  try {
-      let accessToken = await AsyncStorage.getItem('accessToken');
-      if (!accessToken) {
-          accessToken = await refreshAccessToken();
+      if (!userId || !accessToken) {
+        console.error('User not authenticated');
+        return;
       }
 
       const response = await FileSystem.uploadAsync(
+        `${backend_url()}upload/`,
+        image,
+        {
+          httpMethod: 'POST',
+          uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+          fieldName: 'photo',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (response.status === 201) {
+        fetchPhotos();
+        setImage("")
+      } else {
+        if (refreshToken){
+          const newAccessToken = await refreshAccessToken(refreshToken)
+        await FileSystem.uploadAsync(
           `${backend_url()}upload/`,
           image,
           {
-              httpMethod: "POST",
-              uploadType: FileSystem.FileSystemUploadType.MULTIPART,
-              fieldName: "photo",
-              headers: {
-                  "Authorization": `Bearer ${accessToken}`,
-              },
+            httpMethod: 'POST',
+            uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+            fieldName: 'photo',
+            headers: {
+              Authorization: `Bearer ${newAccessToken}`,
+            },
           }
-      );
-
-      if (response.status !== 201) {
-          console.log("Failed to upload image!");
-          const newAccessToken = await refreshAccessToken();
-              // Réessayez l'upload avec le nouveau token
-              await FileSystem.uploadAsync(
-                  `${backend_url()}upload/`,
-                  image,
-                  {
-                      httpMethod: "POST",
-                      uploadType: FileSystem.FileSystemUploadType.MULTIPART,
-                      fieldName: "photo",
-                      headers: {
-                          "Authorization": `Bearer ${newAccessToken}`,
-                      },
-                  }
-              );
-      } else {
-          const uploadedPhoto = JSON.parse(response.body);
-          addPhoto(uploadedPhoto);
-          console.log('Image uploaded successfully:', response.body);
+        );
+        fetchPhotos();
+        setImage("");
+        } else {
+          console.error('RefreshToken is null');
+        }
+        
       }
-  } catch (error:any) {
-      if (error.response && error.response.status === 401) {
-          // Token expiré, essayez de le rafraîchir
-          try {
-              const newAccessToken = await refreshAccessToken();
-              // Réessayez l'upload avec le nouveau token
-              const retryResponse = await FileSystem.uploadAsync(
-                  `${backend_url()}upload/`,
-                  image,
-                  {
-                      httpMethod: "POST",
-                      uploadType: FileSystem.FileSystemUploadType.MULTIPART,
-                      fieldName: "photo",
-                      headers: {
-                          "Authorization": `Bearer ${newAccessToken}`,
-                      },
-                  }
-              );
-
-              if (retryResponse.status !== 201) {
-                  throw new Error("Failed to upload image on retry!");
-              } else {
-                  const uploadedPhoto = JSON.parse(retryResponse.body);
-                  addPhoto(uploadedPhoto);
-                  console.log('Image uploaded successfully on retry:', retryResponse.body);
-              }
-          } catch (retryError: any) {
-              console.error('Retry failed', retryError);
-
-          }
-      } else {
-          console.error(error);
-
-      }
-  }
-};
+    
+    }catch (error: any){
+      console.error('Error uploading image:', error);
+    } finally {
+    }};
 
 
   return (
