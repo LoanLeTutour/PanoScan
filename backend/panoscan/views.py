@@ -281,18 +281,16 @@ from .serializers import PhotoUserSerializer
 class PhotoUserViewSet(ModelViewSet):
     @action(detail=True, methods=['get'])
     def photos(self, request, pk=None):
-        queryset = PhotoUser.objects.filter(user__id=pk).order_by('-uploaded_at')
+        queryset = PhotoUser.objects.filter(user__id=pk, active=True).order_by('-uploaded_at')
         serializer = PhotoUserSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-class UserPhotosAPIView(generics.ListAPIView):
-    serializer_class = PhotoUserSerializer
-
-    def get_queryset(self):
-        user_id = self.kwargs['user_id']
-        return PhotoUser.objects.filter(user__id=user_id)
-
-    def get(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+class PhotoUserDeactivateView(APIView):
+    def patch(self, request, id, format=None):
+        try:
+            photo_user = PhotoUser.objects.get(id=id)
+            photo_user.active = False
+            photo_user.save()
+            return Response({'status': 'Photo désactivée avec succès'}, status=200)
+        except PhotoUser.DoesNotExist:
+            return Response({'error': 'Photo non trouvée'}, status=404)

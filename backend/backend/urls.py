@@ -23,7 +23,7 @@ import panoscan.views
 from panoscan.views import PhotoUserViewSet, DecorViewset, MarketViewset,StructureViewset, ProducerViewset,FormatProductViewset, ProductTypeViewset, CollectionViewset, DecorsForCollectionViewset, StructuresForDecorViewset, FinalProductViewset
 from panoscan.views import AdminDecorViewset, AdminMarketViewset, AdminStructureViewset, AdminProducerViewset,AdminFormatProductViewset, AdminProductTypeViewset, AdminCollectionViewset, AdminDecorsForCollectionViewset, AdminStructuresForDecorViewset, AdminFinalProductViewset
 from rest_framework import routers
-from panoscan.views import PhotoUploadView
+from panoscan.views import PhotoUploadView, PhotoUserDeactivateView
 
 router = routers.SimpleRouter()
 router.register('decor', DecorViewset, basename='decor')
@@ -73,6 +73,7 @@ urlpatterns = [
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('api/', include(router.urls)),
     path('api/upload/', PhotoUploadView.as_view(), name='photo-upload'),
+    path('api/photo_user/<int:id>/deactivate/', PhotoUserDeactivateView.as_view(), name='photo_user_deactivate'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
