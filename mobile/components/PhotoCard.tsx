@@ -5,12 +5,16 @@ import styles from "./PhotoCard.styles";
 import {Colors} from "../constants/Colors";
 import { base_backend_url } from "@/constants/backend_url";
 import { Photo } from "@/app/context/PhotoContext";
-
+import axios from "axios";
+import { backend_url } from "@/constants/backend_url";
+import { useAuth } from "@/app/context/AuthContext";
 interface PhotoCardProps {
     item: Photo;
     index: number;
+    fetchPhotos: () => void;
   }
-const PhotoCard: React.FC<PhotoCardProps> = ({item, index}) => {
+const PhotoCard: React.FC<PhotoCardProps> = ({item, index, fetchPhotos}) => {
+    const {accessToken} = useAuth()
     const formatting_Date = (date: string) => {
         const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin','Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
         const year = date.slice(0, 4)
@@ -20,6 +24,26 @@ const PhotoCard: React.FC<PhotoCardProps> = ({item, index}) => {
         const hour = date.slice(11,13)
         const minutes = date.slice(14,16)
         return `Prise le ${day} ${str_month} ${year} à ${hour}h${minutes}` 
+    }
+
+    const deactivatePhoto = async (photoId: number) => {
+        try {
+            const response = await axios.patch(`${backend_url()}photo_user/${photoId}/deactivate/`, {}, {
+                headers:{
+                    'Content-Type': 'application.json',
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+            if (response.status === 200) {
+                console.log('Photo désactivée avec succès');
+                fetchPhotos();
+            } else {
+                console.error('Echec de la désactivation')
+            }
+        } catch (err) {
+            console.error(err);
+
+        }
     }
     return (
         <View style={styles.container}>
@@ -51,7 +75,9 @@ const PhotoCard: React.FC<PhotoCardProps> = ({item, index}) => {
                     <Text style={styles.buttonText}>Voir détails</Text>
                     <Ionicons name="arrow-forward-circle" color={Colors.white} size={30}/>
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.button, {width: '30%'}]}>
+                <TouchableOpacity 
+                style={[styles.button, {width: '30%'}]}
+                onPress={() => {deactivatePhoto(item.id)}}>
                     <Text style={styles.buttonText}>Supprimer</Text>
                     <Ionicons name="trash" color={Colors.white} size={30}/>
                 </TouchableOpacity>
