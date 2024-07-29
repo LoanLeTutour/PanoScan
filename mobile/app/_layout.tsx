@@ -7,14 +7,10 @@ import 'react-native-reanimated';
 import { AuthProvider } from './context/AuthContext';
 import { PhotoProvider } from './context/PhotoContext';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { SafeAreaView } from 'react-native';
-
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });

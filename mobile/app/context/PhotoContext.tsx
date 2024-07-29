@@ -1,10 +1,9 @@
-import React, { createContext, useContext, useReducer, ReactNode, useEffect, useState } from 'react';
+import React, { createContext, useContext, ReactNode, useEffect, useState } from 'react';
 import axios from 'axios';
 import { backend_url } from '@/constants/backend_url';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from './AuthContext';
 
-type Photo = {
+export type Photo = {
   id: number;
   LocalUri: string;
   active: boolean;

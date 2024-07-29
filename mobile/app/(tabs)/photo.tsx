@@ -29,7 +29,7 @@ const ensureDirExists = async () => {
 
 const HomePage: React.FC = () => {
   const {userId, accessToken, refreshToken, refreshAccessToken, logout} = useAuth()
-  const { fetchPhotos, loading, error } = usePhotos();
+  const { fetchPhotos} = usePhotos();
   const [permission, requestPermission] = useCameraPermissions();
   const [image, setImage] = useState<string>("");
   const [facing, setFacing] = useState<CameraType>('back');
@@ -51,12 +51,13 @@ const HomePage: React.FC = () => {
     );
   }
 
-  const atoggleCameraFacing = () => {
+  const toggleCameraFacing = () => {
     setFacing(current => (current === 'back' ? 'front' : 'back'));
   console.log(facing)}
 
-  const toggleCameraFacing = () => {
-    logout()}
+  // Commande pour tester ponctuellement l'authentification
+  /*const toggleCameraFacing = () => {
+    logout()}*/
 
   const toggleFlashMode = () => {
     setflashMode(current => (current === 'on' ? 'off' : 'on'));
