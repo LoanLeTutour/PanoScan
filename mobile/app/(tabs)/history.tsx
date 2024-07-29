@@ -16,9 +16,8 @@ const Page = () => {
   return (
     <SafeAreaView style={styles.background}>
       <View style={styles.titleContainer}>
-      <Text style={styles.title}>Historique de photos</Text>
-      </View>
-      
+      <Text style={styles.title}>Historique</Text>
+      </View>    
       <FlatList
         data={photos}
         keyExtractor={(item) => item.id.toString()}

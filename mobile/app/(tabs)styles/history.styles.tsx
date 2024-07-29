@@ -10,19 +10,18 @@ const styles = StyleSheet.create({
         flexGrow:1,
         backgroundColor: Colors.white,
         padding: 10,
-        paddingBottom: 20,
 
     },
     titleContainer: {
         backgroundColor: Colors.primary,
-        marginTop: 10
+        marginTop: 10,
     },
     title: {
         alignSelf: 'center',
         padding: 10,
         fontWeight: 'bold',
         color: Colors.white,
-        fontSize: 15
+        fontSize: 18
     }
 });
 

@@ -9,6 +9,8 @@ const styles = StyleSheet.create({
         padding:15,
         gap: 15,
         marginBottom: 10,
+        elevation: 10,
+        shadowColor: Colors.secondary,   
     },
     overview:{
         flexDirection:'row',
@@ -51,6 +53,9 @@ const styles = StyleSheet.create({
         gap: 3,
         backgroundColor: Colors.primary,
         borderRadius: 10,
+        elevation: 5,
+        shadowColor: Colors.primary,
+
     },
     buttonText:{
         color: Colors.white,

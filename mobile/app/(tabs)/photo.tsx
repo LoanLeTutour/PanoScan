@@ -199,27 +199,9 @@ const HomePage: React.FC = () => {
         console.error('User not authenticated');
         return;
       }
-
-      const response = await FileSystem.uploadAsync(
-        `${backend_url()}upload/`,
-        image,
-        {
-          httpMethod: 'POST',
-          uploadType: FileSystem.FileSystemUploadType.MULTIPART,
-          fieldName: 'photo',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-
-      if (response.status === 201) {
-        fetchPhotos();
-        setImage("")
-      } else {
-        if (refreshToken){
-          const newAccessToken = await refreshAccessToken(refreshToken)
-        await FileSystem.uploadAsync(
+      if (refreshToken) {
+        const refreshedAccessToken = await refreshAccessToken(refreshToken)
+        const response = await FileSystem.uploadAsync(
           `${backend_url()}upload/`,
           image,
           {
@@ -227,22 +209,25 @@ const HomePage: React.FC = () => {
             uploadType: FileSystem.FileSystemUploadType.MULTIPART,
             fieldName: 'photo',
             headers: {
-              Authorization: `Bearer ${newAccessToken}`,
+              Authorization: `Bearer ${refreshedAccessToken}`,
             },
           }
         );
-        fetchPhotos();
-        setImage("");
+  
+        if (response.status === 201) {
+          fetchPhotos();
+          setImage("")
         } else {
-          console.error('RefreshToken is null');
+          console.error(`Failed to upload image. Status: ${response.status}`)
+          
         }
-        
       }
+
+      
     
     }catch (error: any){
       console.error('Error uploading image:', error);
-    } finally {
-    }};
+    }}
 
 
   return (

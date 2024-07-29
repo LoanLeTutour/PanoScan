@@ -14,7 +14,7 @@ interface PhotoCardProps {
     fetchPhotos: () => void;
   }
 const PhotoCard: React.FC<PhotoCardProps> = ({item, index, fetchPhotos}) => {
-    const {accessToken} = useAuth()
+    const {accessToken,refreshToken, refreshAccessToken} = useAuth()
     const formatting_Date = (date: string) => {
         const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin','Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
         const year = date.slice(0, 4)
@@ -27,23 +27,28 @@ const PhotoCard: React.FC<PhotoCardProps> = ({item, index, fetchPhotos}) => {
     }
 
     const deactivatePhoto = async (photoId: number) => {
-        try {
-            const response = await axios.patch(`${backend_url()}photo_user/${photoId}/deactivate/`, {}, {
-                headers:{
-                    'Content-Type': 'application.json',
-                    'Authorization': `Bearer ${accessToken}`
+        if (refreshToken){
+            refreshAccessToken(refreshToken)
+            try {
+                const response = await axios.patch(`${backend_url()}photo_user/${photoId}/deactivate/`, {}, {
+                    headers:{
+                        'Content-Type': 'application.json',
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                if (response.status === 200) {
+                    console.log('Photo désactivée avec succès');
+                    fetchPhotos();
+                } else {
+                    console.error('Echec de la désactivation')
                 }
-            });
-            if (response.status === 200) {
-                console.log('Photo désactivée avec succès');
-                fetchPhotos();
-            } else {
-                console.error('Echec de la désactivation')
+            } catch (err) {
+                console.error(err);
+    
             }
-        } catch (err) {
-            console.error(err);
-
         }
+        
+        
     }
     return (
         <View style={styles.container}>
