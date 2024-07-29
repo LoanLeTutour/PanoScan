@@ -13,6 +13,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: Colors.secondary,
         headerShown: false,
       }}>
       <Tabs.Screen
@@ -20,7 +21,6 @@ export default function TabLayout() {
         options={{
           title: 'Photo',
           tabBarLabel: 'Photo',
-          tabBarStyle: {backgroundColor: Colors.white },
           tabBarIcon: ({ color, size }) => (
             <Ionicons name='camera-sharp' color={color} size={size}/>
           ),
@@ -30,7 +30,6 @@ export default function TabLayout() {
         name="history"
         options={{
           title: 'Historique',
-          tabBarStyle: {backgroundColor: Colors.white },
           tabBarLabel: 'Historique',
           tabBarIcon: ({color, size}) => 
             <Ionicons name="images" color={color} size={size}/>,

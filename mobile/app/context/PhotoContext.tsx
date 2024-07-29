@@ -2,6 +2,7 @@ import React, { createContext, useContext,useCallback, ReactNode, useEffect, use
 import axios from 'axios';
 import { backend_url } from '@/constants/backend_url';
 import { useAuth } from './AuthContext';
+import api from './ApiContext';
 
 export type Photo = {
   id: number;
@@ -31,24 +32,44 @@ export const PhotoProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchPhotos = useCallback(async () => {
     setLoading(true)
+    setError(null)
     try {
-      if (refreshToken) {
-        const refreshedAccessToken = await refreshAccessToken(refreshToken)
-      const response = await axios.get<Photo[]>(`${backend_url()}user/${userId}/photos/`, {
+      const response = await api.get<Photo[]>(`${backend_url()}user/${userId}/photos/`, {
         headers: {
-          Authorization: `Bearer ${refreshedAccessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
       setPhotos(response.data);
-      setError(null);
-      }
-    } catch (er) {
+    } catch (er:any) {
+      if (er.response && er.response.status === 401) {
+        try {
+          if (refreshToken) {
+            const newAccessToken = await refreshAccessToken(refreshToken);
+          if (newAccessToken) {
+            // Retry request with new token
+            const retryResponse = await api.get<Photo[]>(`${backend_url()}user/${userId}/photos/`, {
+              headers: {
+                Authorization: `Bearer ${newAccessToken}`,
+              },
+            });
+            setPhotos(retryResponse.data);
+          } else {
+            setError('Failed to refresh access token');
+          }
+          }
+          
+        } catch (refreshError) {
+          setError('Failed to refresh access token');
+        }
+      } else {
         console.error('Failed to fetch photos', er);
         setError('Failed to fetch photos');
+      }
+
     } finally {
       setLoading(false);
     }
-  }, [userId, accessToken]);
+  }, [userId, accessToken, refreshToken, refreshAccessToken]);
   
   
   const handleFetchPhotos = useCallback(async () => {
@@ -64,9 +85,10 @@ export const PhotoProvider = ({ children }: { children: ReactNode }) => {
       await fetchPhotos();
     } catch (err: any) {
       console.error('Error in handleFetchPhotos', err.message);
+      setError('Failed to fetch photos')
 
     }
-  }, [fetchPhotos, userId, accessToken, refreshToken]);
+  }, [fetchPhotos, userId, accessToken]);
 
   useEffect(() => {
     if (userId && accessToken) {

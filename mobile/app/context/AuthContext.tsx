@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from './ApiContext';
 import axios from 'axios';
 import { backend_url } from '@/constants/backend_url';
 import { useRouter } from 'expo-router';
@@ -76,7 +77,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const checkTokenValidity = async (token: string): Promise<boolean> => {
     try {
-      const response = await axios.post(`${backend_url()}token/verify/`, { token });
+      const response = await api.post(`${backend_url()}token/verify/`, { token });
       return response.status === 200;
     } catch (error) {
       return false;
@@ -85,30 +86,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const refreshAccessToken = async (token: string): Promise<string | null> => {
     try {
-      const response = await axios.post(`${backend_url()}token/refresh/`, { refresh: token });
-      if (response.data.access) {
+      const response = await api.post(`${backend_url()}token/refresh/`, { refresh: token });
+      if (response.data && response.data.access) {
         await AsyncStorage.setItem('accessToken', response.data.access);
         setAccessToken(response.data.access);
         return response.data.access;
+      }else {
+        console.error('No access token in the response')
+        return null
       }
     } catch (error) {
+      console.error('Failed to refresh access token', error)
       return null;
     }
-    return null;
   };
   
 
   const login = async (email: string, password: string): Promise<any> => {
     try {
-      console.log('login entrée');
-      const baseUrl = backend_url();
-      const loginUrl = `${baseUrl}token/`;
-      console.log('Sending request to:', loginUrl);
-      const response = await axios.post<AuthResponse>(loginUrl, {
+      const response = await api.post<AuthResponse>(`${backend_url()}token/`, {
         email,
         password,
       });
-      console.log('Response:', response.data);
       if (response.data.access) {
         await AsyncStorage.setItem('accessToken', response.data.access);
         await AsyncStorage.setItem('refreshToken', response.data.refresh);
@@ -127,7 +126,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // setUserId(response.data.userId);
       }
       return response.data;
-    } catch (err) {
+    } catch (err:any) {
       if (axios.isAxiosError(err)) {
         console.log('Axios error details:', err.toJSON());
         console.log('Error response:', err.response);

@@ -199,9 +199,22 @@ const HomePage: React.FC = () => {
         console.error('User not authenticated');
         return;
       }
+      let tokenToUse = accessToken
       if (refreshToken) {
-        const refreshedAccessToken = await refreshAccessToken(refreshToken)
-        const response = await FileSystem.uploadAsync(
+        try {
+          const response = await refreshAccessToken(refreshToken)
+          if (response) {
+            tokenToUse = response
+          } else {
+            console.error('Failed to retrieve access token')
+            return
+          }
+        } catch (refreshError) {
+          console.error('Failed to refresh access token')
+          return;
+        }
+        
+        const uploadResponse = await FileSystem.uploadAsync(
           `${backend_url()}upload/`,
           image,
           {
@@ -209,16 +222,16 @@ const HomePage: React.FC = () => {
             uploadType: FileSystem.FileSystemUploadType.MULTIPART,
             fieldName: 'photo',
             headers: {
-              Authorization: `Bearer ${refreshedAccessToken}`,
+              Authorization: `Bearer ${tokenToUse}`,
             },
           }
         );
   
-        if (response.status === 201) {
+        if (uploadResponse.status === 201) {
           fetchPhotos();
           setImage("")
         } else {
-          console.error(`Failed to upload image. Status: ${response.status}`)
+          console.error(`Failed to upload image. Status: ${uploadResponse.status}`)
           
         }
       }
