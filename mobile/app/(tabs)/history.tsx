@@ -1,9 +1,10 @@
-import React, { useEffect, useCallback } from "react";
-import { View, FlatList, Alert } from "react-native";
+import React, { useEffect } from "react";
+import { View, FlatList, Text} from "react-native";
 
 import styles from "../(tabs)styles/history.styles";
 import PhotoCard from "@/components/PhotoCard";
 import { usePhotos } from "../context/PhotoContext";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Page = () => {
   const { photos, fetchPhotos, loading} = usePhotos();
@@ -13,7 +14,11 @@ const Page = () => {
   }, [fetchPhotos]);
 
   return (
-    <View style={styles.background}>
+    <SafeAreaView style={styles.background}>
+      <View style={styles.titleContainer}>
+      <Text style={styles.title}>Historique de photos</Text>
+      </View>
+      
       <FlatList
         data={photos}
         keyExtractor={(item) => item.id.toString()}
@@ -27,7 +32,7 @@ const Page = () => {
           />
         )}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
