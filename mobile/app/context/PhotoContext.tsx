@@ -1,5 +1,5 @@
 import React, { createContext, useContext,useCallback, ReactNode, useEffect, useState } from 'react';
-import axios from 'axios';
+
 import { backend_url } from '@/constants/backend_url';
 import { useAuth } from './AuthContext';
 import api from './ApiContext';
@@ -17,7 +17,6 @@ export type Photo = {
 type PhotoContextType = {
   photos: Photo[];
   fetchPhotos: () => void;
-  loading: boolean;
   error: string | null;
 };
 
@@ -26,12 +25,10 @@ const PhotoContext = createContext<PhotoContextType | undefined>(undefined);
 
 export const PhotoProvider = ({ children }: { children: ReactNode }) => {
   const [photos, setPhotos] = useState<Photo[]>([]);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { userId, accessToken, refreshAccessToken, refreshToken , setAccessToken} = useAuth();
+  const { userId, accessToken, refreshToken, setLoading, setAccessToken, refreshAccessToken} = useAuth();
 
   const fetchPhotos = useCallback(async () => {
-    setLoading(true)
     setError(null)
     try {
       const response = await api.get<Photo[]>(`${backend_url()}user/${userId}/photos/`, {
@@ -69,9 +66,8 @@ export const PhotoProvider = ({ children }: { children: ReactNode }) => {
       }
 
     } finally {
-      setLoading(false);
     }
-  }, [userId, accessToken, refreshToken, refreshAccessToken, setAccessToken]);
+  }, [userId, refreshAccessToken, setAccessToken]);
   
   
   const handleFetchPhotos = useCallback(async () => {
@@ -87,10 +83,10 @@ export const PhotoProvider = ({ children }: { children: ReactNode }) => {
     if (userId && accessToken) {
       handleFetchPhotos();
     }
-  }, [userId, accessToken, handleFetchPhotos]);
+  }, [userId, handleFetchPhotos]);
 
   return (
-    <PhotoContext.Provider value={{ photos, fetchPhotos: handleFetchPhotos, loading, error}}>
+    <PhotoContext.Provider value={{ photos, fetchPhotos: handleFetchPhotos, error}}>
       {children}
     </PhotoContext.Provider>
   );

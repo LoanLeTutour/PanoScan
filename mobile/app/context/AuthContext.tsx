@@ -1,9 +1,12 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import api from './ApiContext';
-import axios from 'axios';
-import { backend_url } from '@/constants/backend_url';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+
+import api from './ApiContext';
+import { backend_url } from '@/constants/backend_url';
+
+// Contexte d'authentification 
 
 type AuthResponse = {
   access: string;
@@ -13,11 +16,12 @@ type AuthResponse = {
 
 type AuthContextType = {
   userId: string | null;
+  loading: boolean;
   accessToken: string | null;
   refreshToken: string | null;
+  setLoading: (arg0: boolean) => void;
   setAccessToken: (token: string) => void;
   refreshAccessToken: (token: string) => Promise<string | null>;
-  setUser: (userId: string, token: string) => void;
   login: (email: string, password: string) => Promise<any>;
   logout: () => void;
 };
@@ -26,10 +30,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [userId, setUserId] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const router = useRouter()
 
+  // un effet est ajouté pour récupérer les key asyncStorage à chaque connexion et les mettre à jour si besoin
   useEffect(() => {
     const loadAuthData = async () => {
       try{
@@ -69,13 +75,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     loadAuthData();
   }, []);
 
-  const setUser = (userId: string, token: string) => {
-    AsyncStorage.setItem('userId', userId);
-    AsyncStorage.setItem('accessToken', token);
-    setUserId(userId);
-    setAccessToken(token);
-  };
 
+  // Checker la validité du token refresh
   const checkTokenValidity = async (token: string): Promise<boolean> => {
     try {
       const response = await api.post(`${backend_url()}token/verify/`, { token });
@@ -84,7 +85,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return false;
     }
   };
-
+  // Rafraichir l'access token à l'aide du refresh token
   const refreshAccessToken = async (token: string): Promise<string | null> => {
     try {
       const response = await api.post(`${backend_url()}token/refresh/`, { refresh: token });
@@ -102,7 +103,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
   
-
+  // Logique de connexion
   const login = async (email: string, password: string): Promise<any> => {
     try {
       const response = await api.post<AuthResponse>(`${backend_url()}token/`, {
@@ -123,8 +124,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.error('UserId not found in response');
       }
         router.replace('(tabs)/photo'); 
-        // Assuming you have a way to get userId from the response or a subsequent request
-        // setUserId(response.data.userId);
       }
       return response.data;
     } catch (err:any) {
@@ -138,7 +137,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     }
   };
-
+  // Logique de déconnexion
   const logout = async () => {
     setUserId(null);
     setAccessToken(null);
@@ -151,7 +150,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ userId, accessToken, refreshToken,setAccessToken, refreshAccessToken,setUser, login, logout }}>
+    <AuthContext.Provider value={{ userId, loading, accessToken, refreshToken, setLoading, setAccessToken, refreshAccessToken, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

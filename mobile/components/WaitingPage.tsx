@@ -21,8 +21,8 @@ const createAnimation = (delay: number) => {
 const LoadingSpinner = () => {
   // Création des animations pour les trois ronds
   const animation1 = createAnimation(0);
-  const animation2 = createAnimation(500);
-  const animation3 = createAnimation(1000);
+  const animation2 = createAnimation(200);
+  const animation3 = createAnimation(400);
 
   // Interpolation pour les opacités
   const opacity1 = animation1.interpolate({

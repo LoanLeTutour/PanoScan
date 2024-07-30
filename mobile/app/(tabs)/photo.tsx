@@ -16,6 +16,7 @@ import styles from "../(tabs)styles/photo.styles";
 import { backend_url } from "@/constants/backend_url";
 import { useAuth } from "../context/AuthContext";
 import { usePhotos } from "../context/PhotoContext";
+import LoadingSpinner from "@/components/WaitingPage";
 
 
 const imgDir = FileSystem.documentDirectory + 'photos/';
@@ -28,7 +29,7 @@ const ensureDirExists = async () => {
 };
 
 const HomePage: React.FC = () => {
-  const {userId, accessToken, refreshToken, refreshAccessToken, logout} = useAuth()
+  const {userId, loading, accessToken, refreshToken, setLoading, refreshAccessToken, logout} = useAuth()
   const { fetchPhotos} = usePhotos();
   const [permission, requestPermission] = useCameraPermissions();
   const [image, setImage] = useState<string>("");
@@ -194,6 +195,7 @@ const HomePage: React.FC = () => {
   };
   
   const uploadPhoto = async () => {
+    setLoading(true)
     try {
       if (!userId || !accessToken) {
         console.error('User not authenticated');
@@ -240,10 +242,14 @@ const HomePage: React.FC = () => {
     
     }catch (error: any){
       console.error('Error uploading image:', error);
-    }}
+    }finally {
+      setLoading(false)
+    }
+  }
 
 
   return (
+    loading ? <LoadingSpinner/> :
     <View style={styles.container}>
       {!image ? displayCamera() : displayTakenImage(image)}
     </View>
