@@ -43,6 +43,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const storedAccessToken = await AsyncStorage.getItem('accessToken');
         const storedRefreshToken = await AsyncStorage.getItem('refreshToken');
 
+        console.log('Stored User ID:', storedUserId);
+        console.log('Stored Access Token:', storedAccessToken);
+        console.log('Stored Refresh Token:', storedRefreshToken);
+        
         if (storedUserId && storedRefreshToken) {
           const isTokenValid = await checkTokenValidity(storedRefreshToken);
           if (isTokenValid) {

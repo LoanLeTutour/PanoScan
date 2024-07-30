@@ -62,6 +62,7 @@ const LogInScreen: React.FC = () => {
 
   const handleLogin = async () => {
     try {
+      console.log('handling login...')
       await login(email, password);
     } catch (error) {
       setErrorMessage('Invalid email or password');
