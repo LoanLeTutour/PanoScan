@@ -28,7 +28,7 @@ export const PhotoProvider = ({ children }: { children: ReactNode }) => {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { userId, accessToken, refreshAccessToken, refreshToken } = useAuth();
+  const { userId, accessToken, refreshAccessToken, refreshToken , setAccessToken} = useAuth();
 
   const fetchPhotos = useCallback(async () => {
     setLoading(true)
@@ -46,7 +46,7 @@ export const PhotoProvider = ({ children }: { children: ReactNode }) => {
           if (refreshToken) {
             const newAccessToken = await refreshAccessToken(refreshToken);
           if (newAccessToken) {
-            // Retry request with new token
+            setAccessToken(newAccessToken)
             const retryResponse = await api.get<Photo[]>(`${backend_url()}user/${userId}/photos/`, {
               headers: {
                 Authorization: `Bearer ${newAccessToken}`,
@@ -56,6 +56,8 @@ export const PhotoProvider = ({ children }: { children: ReactNode }) => {
           } else {
             setError('Failed to refresh access token');
           }
+          } else {
+            setError('Refresh token missing')
           }
           
         } catch (refreshError) {
@@ -69,7 +71,7 @@ export const PhotoProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setLoading(false);
     }
-  }, [userId, accessToken, refreshToken, refreshAccessToken]);
+  }, [userId, accessToken, refreshToken, refreshAccessToken, setAccessToken]);
   
   
   const handleFetchPhotos = useCallback(async () => {
@@ -78,16 +80,7 @@ export const PhotoProvider = ({ children }: { children: ReactNode }) => {
       setError('User not authenticated');
       return;
     }
-    setLoading(true);
-    setError(null);
-
-    try {
       await fetchPhotos();
-    } catch (err: any) {
-      console.error('Error in handleFetchPhotos', err.message);
-      setError('Failed to fetch photos')
-
-    }
   }, [fetchPhotos, userId, accessToken]);
 
   useEffect(() => {

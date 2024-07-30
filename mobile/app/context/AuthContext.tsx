@@ -15,6 +15,7 @@ type AuthContextType = {
   userId: string | null;
   accessToken: string | null;
   refreshToken: string | null;
+  setAccessToken: (token: string) => void;
   refreshAccessToken: (token: string) => Promise<string | null>;
   setUser: (userId: string, token: string) => void;
   login: (email: string, password: string) => Promise<any>;
@@ -150,7 +151,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ userId, accessToken, refreshToken, refreshAccessToken,setUser, login, logout }}>
+    <AuthContext.Provider value={{ userId, accessToken, refreshToken,setAccessToken, refreshAccessToken,setUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
