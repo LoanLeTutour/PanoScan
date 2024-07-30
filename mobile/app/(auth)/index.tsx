@@ -25,9 +25,8 @@ const LogInScreen: React.FC = () => {
     const response = await axios.post(`${backend_url()}token/refresh/`, {
       refresh: refreshToken,
     });
-    const { access, refresh } = response.data;
+    const { access} = response.data;
     await AsyncStorage.setItem('accessToken', access);
-    await AsyncStorage.setItem('refreshToken', refresh);
     router.replace('(tabs)/photo')
     } catch(error:any){
       console.log('key existence checking error', error)
