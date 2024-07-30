@@ -7,12 +7,12 @@ import { usePhotos } from "../context/PhotoContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Page = () => {
-  const { photos, fetchPhotos, loading} = usePhotos();
+  const { photos, fetchPhotos} = usePhotos();
 
   useEffect(() => {
     fetchPhotos();
   }, [fetchPhotos]);
-
+  
   return (
     <SafeAreaView style={styles.background}>
       <View style={styles.titleContainer}>

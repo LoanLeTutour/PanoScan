@@ -1,11 +1,12 @@
-import { TouchableOpacity, View, Text, Image } from "react-native";
+import { useState } from "react";
+import { TouchableOpacity, View, Text, Image, Modal, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import axios from "axios";
 
 import styles from "./PhotoCard.styles";
 import {Colors} from "../constants/Colors";
 import { base_backend_url } from "@/constants/backend_url";
 import { Photo } from "@/app/context/PhotoContext";
-import axios from "axios";
 import { backend_url } from "@/constants/backend_url";
 import { useAuth } from "@/app/context/AuthContext";
 interface PhotoCardProps {
@@ -15,6 +16,9 @@ interface PhotoCardProps {
   }
 const PhotoCard: React.FC<PhotoCardProps> = ({item, index, fetchPhotos}) => {
     const {accessToken,refreshToken, refreshAccessToken} = useAuth()
+    const [modalVisible, setModalVisible] = useState(false);
+    const [imageLoading, setImageLoading] = useState(true);
+
     const formatting_Date = (date: string) => {
         const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin','Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
         const year = date.slice(0, 4)
@@ -54,11 +58,23 @@ const PhotoCard: React.FC<PhotoCardProps> = ({item, index, fetchPhotos}) => {
         <View style={styles.container}>
             <View style={styles.overview}>
             <View style={styles.imageContainer}>
+                { imageLoading && (
+                    <ActivityIndicator
+                    style={styles.loadingSpinner}
+                    size="large"
+                    color={Colors.primary}
+                    />
+                )}
             <Image 
                 resizeMode="cover"
                 style={styles.image}
                 source={{uri : `${base_backend_url()}${item.photo}`}}
-                onError={(e) => console.log('Image failed to load', e.nativeEvent.error)}
+                onLoadStart={() => setImageLoading(true)}
+                onLoadEnd={() => setImageLoading(false)}
+                onError={(e) => {
+                    console.log('Image failed to load', e.nativeEvent.error)
+                    setImageLoading(false)
+                }}
                 />
             </View>
             <View style={styles.infoContainer}>
@@ -82,13 +98,49 @@ const PhotoCard: React.FC<PhotoCardProps> = ({item, index, fetchPhotos}) => {
                 </TouchableOpacity>
                 <TouchableOpacity 
                 style={[styles.button, {width: '30%'}]}
-                onPress={() => {deactivatePhoto(item.id)}}>
+                onPress={() => setModalVisible(true)}>
                     <Text style={styles.buttonText}>Supprimer</Text>
                     <Ionicons name="trash" color={Colors.white} size={30}/>
                 </TouchableOpacity>
             </View>
+            <Modal 
+            visible={modalVisible}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>Voulez-vous vraiment supprimer cette photo ?</Text>
+                        <Image 
+                        resizeMode="cover"
+                        style={styles.imageModal}
+                        source={{uri : `${base_backend_url()}${item.photo}`}}
+                        onError={(e) => console.log('Image failed to load', e.nativeEvent.error)}
+                        />
+                        <View style={styles.modalButtonContainer}>
+                            <TouchableOpacity
+                            style={styles.modalButton}
+                            onPress={() => {
+                                deactivatePhoto(item.id)
+                                setModalVisible(false)
+                            }}
+                            >
+                                <Text style={styles.modalText}>Oui</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                            style={styles.modalButton}
+                            onPress={() => setModalVisible(false)}
+                            >
+                                <Text style={styles.modalText}>Non</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </View>
-                
+        
+
 
     )
 };

@@ -65,7 +65,52 @@ const styles = StyleSheet.create({
     text:{
         color: Colors.white,
         fontWeight: 'bold',
-    }
+    },
+    modalContainer:{
+        flex: 1,
+        justifyContent:'center',
+        alignItems:'center',
+        backgroundColor: Colors.secondary,
+        opacity: 0.9
+    },
+    modalView:{
+        alignItems: 'center',
+        padding: 30,
+        
+    },
+    modalText:{
+        color: Colors.white,
+        fontWeight: 'bold',
+        fontSize: 25,
+        textAlign: 'center'
+    },
+    modalButtonContainer:{
+        flexDirection: "row",
+        justifyContent: 'space-between',
+        width: '100%'
+    },
+    modalButton:{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: Colors.primary,
+        height: 100,
+        marginHorizontal: 10,
+        borderRadius: 10
+    },
+    imageModal:{
+        width: 280,
+        height:400,
+        borderRadius: 20,
+        margin: 20
+    },
+    loadingSpinner: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: [{ translateX: -25 }, { translateY: -25 }],
+        zIndex: 1,
+      },
 
 })
 
