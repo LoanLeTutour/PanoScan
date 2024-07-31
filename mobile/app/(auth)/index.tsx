@@ -6,6 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import styles from "./index.styles";
 import axios from "axios";
 import { backend_url } from "@/constants/backend_url";
+import LoadingSpinner from "@/components/WaitingPage";
 const LogInScreen: React.FC = () => {
   const router = useRouter();
 
@@ -14,20 +15,26 @@ const LogInScreen: React.FC = () => {
   const [mailPlaceholder, setMailPlaceholder] = useState<string>("Adresse mail");
   const [passwordPlaceholder, setPasswordPlaceholder] = useState<string>("Mot de passe");
   const [errorMessage, setErrorMessage] = useState<string>('');
-  const {login} = useAuth()
+  const {login, loading} = useAuth()
 
   const checkLoggedIn = async (key: string) => {
+    console.log('check logged in function in index page')
     try {
     const refreshToken = await AsyncStorage.getItem(key);
+    console.log('refresh token from asyncstorage:', refreshToken)
     if (!refreshToken) {
       return
     }
+    console.log('refreshing the access token')
     const response = await axios.post(`${backend_url()}token/refresh/`, {
       refresh: refreshToken,
     });
     const { access} = response.data;
+    console.log('accessToken updated:', access)
     await AsyncStorage.setItem('accessToken', access);
+    console.log('updated accessToken to asyncStorage')
     router.replace('(tabs)/photo')
+    console.log('redirect to photo page')
     } catch(error:any){
       console.log('key existence checking error', error)
       if (error.response && error.response.status === 401){
@@ -39,9 +46,9 @@ const LogInScreen: React.FC = () => {
     checkLoggedIn('refreshToken')
   }, []);
   
-  const checkInputs = () => {
+  const checkInputs = async () => {
     if (checkMailInput() && checkPasswordInput()) {
-      handleLogin();
+      await handleLogin();
     }
   };
   const checkMailInput = () => {
@@ -61,18 +68,20 @@ const LogInScreen: React.FC = () => {
   };
 
   const handleLogin = async () => {
-    try {
-      console.log('handling login...')
-      await login(email, password);
-    } catch (error) {
-      setErrorMessage('Invalid email or password');
-      console.log(error)
+    console.log('Handling login...');
+    
+    const result = await login(email, password);
+    console.log('Login finished');
+  
+    if (!result.success) {
+      setErrorMessage(result.message || 'Erreur inconnue');
     }
   };
 
   
 
   return (
+    loading ? <LoadingSpinner/> :
     <View style={styles.container}>
       <Text style={styles.title}>PanoScan</Text>
       <View style={styles.formContainer}>
