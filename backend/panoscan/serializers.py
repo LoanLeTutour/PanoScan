@@ -155,10 +155,7 @@ class FinalProductSerializer(ModelSerializer):
 class PhotoUserSerializer(ModelSerializer):
     class Meta:
         model = PhotoUser
-        fields = ['id', 'photo', 'uploaded_at', 'user', 'result', 'active']
+        fields = ['id', 'photo_url', 'uploaded_at', 'user', 'result', 'active']
         read_only_fields = ['id', 'uploaded_at', 'result', 'active']
-    def get_image(self, obj):
-        request = self.context.get('request')
-        if obj.photo:
-            return request.build_absolute_uri(obj.photo.url)
-        return None
+    def get_photo(self, obj):
+        return obj.photo_url

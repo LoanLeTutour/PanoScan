@@ -87,9 +87,9 @@ class Decor(models.Model):
     name = models.CharField(max_length=50)
     code = models.CharField(max_length=10)
     ncs_equivalent = models.CharField(max_length=15, null=True, blank=True)
-    image = models.ImageField(verbose_name="Photo fabricant")
     producer = models.ForeignKey(Producer, on_delete=models.CASCADE, related_name='decors')
     active = models.BooleanField(default=True)
+    photo_url = models.CharField(max_length=300, null=True, blank=True)
     
     def __str__(self) -> str:
         return f'{self.code}-{self.producer}'
@@ -122,15 +122,16 @@ class Collection(models.Model):
         self.decor_collection.update(active=False)
 
 class PhotoTraining(models.Model):
-    photo = models.ImageField()
+    photo_url = models.CharField(max_length=300, null=True, blank=True)
     decor = models.ForeignKey(Decor, on_delete=models.CASCADE, related_name='photos_training')
     active = models.BooleanField(default=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     producer = models.ForeignKey(Producer, on_delete=models.CASCADE, related_name='photos_training', default=True, null=True)
-
+    def __str__(self):
+        return f"Photo_id: {self.id}, photo_url: {self.photo_url}, décor: {self.decor.code}"
 from authentication.models import User
 class PhotoUser(models.Model):
-    photo = models.ImageField(upload_to='images/')
+    photo_url = models.CharField(max_length=300, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='photos_user')
     uploaded_at = models.DateTimeField(auto_now_add=True)
     result = models.JSONField(blank=True, default=dict)

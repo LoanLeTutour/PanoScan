@@ -248,14 +248,16 @@ class AdminFinalProductViewset(ModelViewSet):
 
 
 ## Ajout de photos pour l'entrainement du modèle
-
+import tempfile
+from .management.utils.save_photo_user_drive import save_photo_user_drive
 class PhotoUploadView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         print("Headers: ", request.headers)
-        data = request.data
+        data = {key: value for key, value in request.data.items() if key != 'photo'}
         data['user'] = request.user.id
+
         if 'photo' not in request.FILES:
             return Response({'error': 'No file provided'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -263,6 +265,17 @@ class PhotoUploadView(APIView):
         # Vérifiez que le fichier a un nom
         if not photo.name:
             return Response({'error': 'File must have a name'}, status=status.HTTP_400_BAD_REQUEST)
+        with tempfile.NamedTemporaryFile(delete=True) as tmp:
+            for chunk in photo.chunks():
+                tmp.write(chunk)
+            tmp.flush()
+            try:
+                photo_url = save_photo_user_drive(tmp.name, photo.name, photo.content_type)
+            except Exception as e:
+                print(f"Error uploading to Google Drive: {e}")
+                return Response({'error': 'Failed to upload file to Google Drive'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        data['photo_url'] = photo_url
         serializer = PhotoUserSerializer(data=data)
         if serializer.is_valid():
             serializer.save(user=request.user)
