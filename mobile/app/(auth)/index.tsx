@@ -1,87 +1,61 @@
-import { useState, useEffect} from "react";
-import { View, Text,TextInput, TouchableOpacity} from "react-native";
-import { useRouter} from "expo-router";
+import { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
 import { useAuth } from "../context/AuthContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import styles from "./index.styles";
-import axios from "axios";
-import { backend_url } from "@/constants/backend_url";
 import LoadingSpinner from "@/components/WaitingPage";
+
 const LogInScreen: React.FC = () => {
-  const router = useRouter();
 
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [mailPlaceholder, setMailPlaceholder] = useState<string>("Adresse mail");
-  const [passwordPlaceholder, setPasswordPlaceholder] = useState<string>("Mot de passe");
-  const [errorMessage, setErrorMessage] = useState<string>('');
-  const {login, loading} = useAuth()
+  const [mailPlaceholder, setMailPlaceholder] =
+    useState<string>("Adresse mail");
+  const [passwordPlaceholder, setPasswordPlaceholder] =
+    useState<string>("Mot de passe");
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const { login, loading } = useAuth();
 
-  const checkLoggedIn = async (key: string) => {
-    console.log('check logged in function in index page')
-    try {
-    const refreshToken = await AsyncStorage.getItem(key);
-    console.log('refresh token from asyncstorage:', refreshToken)
-    if (!refreshToken) {
-      return
+
+  // Premiers filtres pour l'email et le mot de passe une fois le bouton "suivant" poussé
+  const checkMailInput = () => {
+    if (email === "") {
+      setMailPlaceholder("Entrez votre adresse mail");
+      setErrorMessage("Vous devez entrer une addresse mail et un mot de passe valides")
+      return false;
     }
-    console.log('refreshing the access token')
-    const response = await axios.post(`${backend_url()}token/refresh/`, {
-      refresh: refreshToken,
-    });
-    const { access} = response.data;
-    console.log('accessToken updated:', access)
-    await AsyncStorage.setItem('accessToken', access);
-    console.log('updated accessToken to asyncStorage')
-    router.replace('(tabs)/photo')
-    console.log('redirect to photo page')
-    } catch(error:any){
-      console.log('key existence checking error', error)
-      if (error.response && error.response.status === 401){
-        return;
-      }
-    }
+    return true;
   };
-  useEffect(() => {
-    checkLoggedIn('refreshToken')
-  }, []);
-  
+  const checkPasswordInput = () => {
+    if (password === "") {
+      setPasswordPlaceholder("Entrez votre mot de passe");
+      setErrorMessage("Vous devez entrer une addresse mail et un mot de passe valides")
+      return false;
+    }
+    return true;
+  };
+
   const checkInputs = async () => {
     if (checkMailInput() && checkPasswordInput()) {
       await handleLogin();
     }
   };
-  const checkMailInput = () => {
-    if (email === "") {
-      setMailPlaceholder("Entrez votre adresse mail");
-      return false;
-    }
-    return true;
-  };
 
-  const checkPasswordInput = () => {
-    if (password === "") {
-      setPasswordPlaceholder("Entrez votre mot de passe");
-      return false;
-    }
-    return true;
-  };
-
+  // Une fois que les premiers filtres sont passés, la fonction login du AuthContext est appelé
   const handleLogin = async () => {
-    console.log('Handling login...');
-    
+    console.log("Filtres passés => fonction Login de l'AuthContext");
     const result = await login(email, password);
-    console.log('Login finished');
-  
+    console.log("Login finished");
+
     if (!result.success) {
-      setErrorMessage(result.message || 'Erreur inconnue');
+      console.log(result.message)
+      setErrorMessage(result.message || "Erreur inconnue");
     }
   };
 
-  
-
-  return (
-    loading ? <LoadingSpinner/> :
+  return loading ? (
+    <LoadingSpinner />
+  ) : (
     <View style={styles.container}>
       <Text style={styles.title}>PanoScan</Text>
       <View style={styles.formContainer}>
@@ -94,9 +68,7 @@ const LogInScreen: React.FC = () => {
             style={styles.inputField}
             placeholder={mailPlaceholder}
             value={email}
-            onChangeText={(email: string) =>
-              setEmail(email)
-            }
+            onChangeText={(email: string) => setEmail(email)}
           />
           <TextInput
             autoCapitalize="none"
