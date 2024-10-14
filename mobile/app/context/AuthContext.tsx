@@ -35,133 +35,39 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const router = useRouter()
 
-  // un effet est ajouté pour récupérer les key asyncStorage à chaque connexion et les mettre à jour si besoin
-  useEffect(() => {
-    const loadAuthData = async () => {
-      try{
-        const storedUserId = await AsyncStorage.getItem('userId');
-        const storedAccessToken = await AsyncStorage.getItem('accessToken');
-        const storedRefreshToken = await AsyncStorage.getItem('refreshToken');
-
-        console.log('Stored User ID:', storedUserId);
-        console.log('Stored Access Token:', storedAccessToken);
-        console.log('Stored Refresh Token:', storedRefreshToken);
-        
-        if (storedUserId && storedRefreshToken) {
-          const isTokenValid = await checkTokenValidity(storedRefreshToken);
-          if (isTokenValid) {
-            console.log('refresh Token valid !')
-            setUserId(storedUserId);
-            setRefreshToken(storedRefreshToken);
-            const newAccessToken = await refreshAccessToken(storedRefreshToken);
-              if (newAccessToken) {
-                setAccessToken(newAccessToken);
-                router.replace('/(tabs)/photo');
-              } else {
-                logout();
-              }
-
-          } else {
-            logout()
-          }
-      }
-
-      } catch(error) {
-        console.error('Failed to load authentication data', error);
-      }
-      
-    };
-
-    loadAuthData();
-  }, []);
-
-
   // Checker la validité du token refresh
-  const checkTokenValidity = async (token: string): Promise<boolean> => {
+  const checkRefreshTokenValidity = async (token: string): Promise<boolean> => {
     console.log('verifying the validity of refresh token...')
     try {
       const response = await api.post(`${backend_url()}token/verify/`, { token });
-      return response.status === 200;
-    } catch (error) {
+      if (response.status === 200){return true}
+      else {throw Error}
+      } catch (error) {
+      console.log(error)
       return false;
     }
   };
-  // Rafraichir l'access token à l'aide du refresh token
-  const refreshAccessToken = async (token: string): Promise<string | null> => {
-    try {
-      const response = await api.post(`${backend_url()}token/refresh/`, { refresh: token });
-      if (response.data && response.data.access) {
-        await AsyncStorage.setItem('accessToken', response.data.access);
-        setAccessToken(response.data.access);
-        return response.data.access;
-      }else {
-        console.error('No access token in the response')
-        return null
-      }
-    } catch (error) {
-      console.error('Failed to refresh access token', error)
-      return null;
-    }
-  };
-  
-  // Logique de connexion
-  const login = async (email: string, password: string): Promise<{ success: boolean; message?: string }> => {
-    setLoading(true);
-    
-    try {
-      console.log('Trying to login...');
-      
-      const response = await axios.post<AuthResponse>(`${backend_url()}token/`, { email, password });
-  
-      if (response.data.access && response.data.refresh) {
-        console.log('Access and refresh tokens retrieved');
-  
-        await AsyncStorage.setItem('accessToken', response.data.access);
-        await AsyncStorage.setItem('refreshToken', response.data.refresh);
-  
-        setAccessToken(response.data.access);
-        setRefreshToken(response.data.refresh);
-  
-        const userId = response.data.user_id;
-  
-        if (userId) {
-          await AsyncStorage.setItem('userId', userId.toString());
-          setUserId(userId.toString());
-        } else {
-          console.error('UserId not found in response');
+
+    // Rafraichir l'access token à l'aide du refresh token
+    const refreshAccessToken = async (token: string): Promise<string | null> => {
+      try {
+        const response = await api.post(`${backend_url()}token/refresh/`, { refresh: token });
+        if (response.data && response.data.access) {
+          await AsyncStorage.setItem('accessToken', response.data.access);
+          setAccessToken(response.data.access);
+          return response.data.access;
+        }else {
+          console.error('No access token in the response')
+          throw Error
         }
-        router.replace('(tabs)/photo');
-        console.log('Redirecting to photo page');
-        setLoading(false);
-        return { success: true };
-      } else {
-        setLoading(false)
-        return {success : false, message : 'Les tokens ne sont pas présents dans la response'}
+      } catch (error) {
+        console.error('Failed to refresh access token', error)
+        return null;
       }
-    } catch (err: any) {
-      setLoading(false);
-  
-      if (axios.isAxiosError(err)) {
-        const status = err.response?.status;
-        if (status === 401) {
-          console.log('Invalid credentials');
-          return { success: false, message: 'Email et/ou mot de passe incorrect' };
-        }
-        if (status === 404) {
-          console.log('Email not found in database');
-          return { success: false, message: "Cet email n'est pas associé à un compte PanoScan" };
-        }
-        console.log('Network or server error', err.message);
-        return { success: false, message: 'Problème de réseau ou serveur' };
-      } else {
-        console.log('Unexpected error:', err);
-        return { success: false, message: 'Erreur inattendue' };
-      }
-    }
-  };
+    };
+
   // Logique de déconnexion
   const logout = async () => {
-    
     setAccessToken(null);
     setRefreshToken(null);
 
@@ -171,6 +77,114 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     router.replace('/');
     setUserId(null);
   };
+
+
+
+  const loadAuthData = async () => { // Fonction qui récupère les données de l'asyncStorage à l'arrivée dans l'application
+    try{
+      setLoading(true);
+      const storedUserId = await AsyncStorage.getItem('userId');
+      const storedAccessToken = await AsyncStorage.getItem('accessToken');
+      const storedRefreshToken = await AsyncStorage.getItem('refreshToken');
+
+      console.log('Stored User ID:', storedUserId);
+      console.log('Stored Access Token:', storedAccessToken);
+      console.log('Stored Refresh Token:', storedRefreshToken);
+
+      if (!(storedUserId && storedRefreshToken)){ // En arrivant sur la page d'accueil, pas d'userId ou de refreshToken => logout()
+        logout();
+      }
+      else{
+        const isRefreshTokenValid = await checkRefreshTokenValidity(storedRefreshToken);
+        if (!isRefreshTokenValid){ // Si le refreshToken est expiré, logout()
+          logout()
+        }
+        else{ // Sinon, on rafraichit l'accessToken car sa durée de vie est de 5 minutes
+          const newAccessToken = await refreshAccessToken(storedRefreshToken);
+          if (!newAccessToken) { // Si il n'y a pas d'accessToken, le refreshToken s'est expiré entre le checkRefreshToken et le refreshAccessToken => logout()
+            logout();
+          }
+          else {
+          // Si l'accessToken est valide, on enregistre les données dans les états et l'utilisateur est connecté sur la page photo
+            setAccessToken(newAccessToken);
+            setRefreshToken(storedRefreshToken);
+            setUserId(storedUserId);
+            router.replace('/(tabs)/photo');
+          }
+        }
+      }
+
+    } catch(error) {
+      console.error('Failed to load authentication data', error);
+      logout()
+    }finally{
+      setLoading(false);
+    }
+    
+  };
+  // un effet se déclenche pour récupérer les keys asyncStorage à chaque connexion et les mettre à jour si besoin
+  useEffect(() => {
+
+    loadAuthData();
+  }, []);
+
+
+  
+
+  
+  // Logique de connexion
+  const login = async (email: string, password: string): Promise<{ success: boolean; message?: string }> => {
+    try {
+      setLoading(true);
+      console.log('Entrée dans la fonction login de l"AuthContext');
+      console.log(`appel API au : ${backend_url()}token/`)
+      const response = await axios.post<AuthResponse>(`${backend_url()}token/`, { email, password });
+      console.log(response)
+      if (response.data.access && response.data.refresh && response.data.user_id) {
+        console.log('Data retrieved !');
+        const user_id_string = response.data.user_id.toString()
+        // Stockage des données dans l'asyncStorage
+        await AsyncStorage.setItem('accessToken', response.data.access);
+        await AsyncStorage.setItem('refreshToken', response.data.refresh);
+        await AsyncStorage.setItem('user_id', user_id_string)
+        
+        // Stockage des données dans les états
+        setAccessToken(response.data.access);
+        setRefreshToken(response.data.refresh);
+        setUserId(user_id_string)
+
+        // Redirection de l'utilisateur sur la page photo
+        router.replace('(tabs)/photo');
+        console.log('Redirecting to photo page');
+        return { success: true, message: `Connexion réussie de l'utilisateur ID: ${userId}` };
+        }
+      else {
+        return {success : false, message : "Les tokens ou l'userId ne sont pas présents dans la response"}
+      }
+    } catch (err: any) {
+  
+      if (axios.isAxiosError(err)) {
+        const status = err.response?.status;
+        switch (status) {
+          case 401:
+            console.log('Invalid credentials');
+            return { success: false, message: 'Email et/ou mot de passe incorrect' };
+          case 404:
+            console.log('Email not found in database');
+            return { success: false, message: "Cet email n'est pas associé à un compte PanoScan" };
+          default:
+            console.log('Network or server error', err.message);
+            return { success: false, message: 'Problème de réseau ou serveur' };
+        }
+      } else {
+        console.log('Unexpected error:', err);
+        return { success: false, message: 'Erreur inattendue' };
+      }
+    }finally{
+      setLoading(false)
+    }
+  };
+
 
   return (
     <AuthContext.Provider value={{ userId, loading, accessToken, refreshToken, setLoading, setAccessToken, refreshAccessToken, login, logout }}>
