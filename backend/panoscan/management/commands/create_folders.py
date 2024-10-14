@@ -48,7 +48,7 @@ class Command(BaseCommand):
             service = authenticate_google_drive()
 
             # ID du dossier Photos Training sur Google Drive
-            photos_training_folder_id = '1470Y8elBuoLVtF_LebqZ7vECcoL6orWQ'
+            photos_training_folder_id = '1JinAKr_YIl4HA6AkwSzdkSS5CLJ7ng1O'
 
             list_files_in_folder(service, photos_training_folder_id)
             
