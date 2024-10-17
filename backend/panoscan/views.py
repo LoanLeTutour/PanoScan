@@ -4,7 +4,6 @@ from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import status
-from rest_framework.decorators import api_view
 
 from .models import Market, Producer,FormatProduct, ProductType, Structure, Collection, Decor, FinalProduct, StructuresForDecor, DecorsForCollection, PhotoTraining, PhotoUser
 from .serializers import MarketListSerializer, MarketDetailSerializer
@@ -35,23 +34,7 @@ def home(request):
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from django.contrib.auth import authenticate
 
-class TokenView(APIView):
-    def post(self, request, *args, **kwargs):
-        print('Request Data:', request.data)  # Debug statement
-        email = request.data.get('email')
-        password = request.data.get('password')
-        
-        if email is None or password is None:
-            return Response({'error': 'Username and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        user = authenticate(email=email, password=password)
-        if user is not None:
-            # Generate and return token (example response)
-            return Response({'token': 'your-token-here'}, status=status.HTTP_200_OK)
-        else:
-            return Response({'error': 'Invalid credentials.'}, status=status.HTTP_400_BAD_REQUEST)
 
 class MultipleSerializerMixin:
     detail_serializer_class = None
