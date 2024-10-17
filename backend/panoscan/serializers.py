@@ -15,6 +15,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
         data['user_id'] = self.user.id
+        data['market_id'] = self.user.market.id
         return data
 
 # Market serializers

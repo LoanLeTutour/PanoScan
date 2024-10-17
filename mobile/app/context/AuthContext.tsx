@@ -12,6 +12,7 @@ type AuthResponse = {
   access: string;
   refresh: string;
   user_id: string; 
+  market_id: string
 };
 
 type AuthContextType = {
@@ -19,6 +20,7 @@ type AuthContextType = {
   loading: boolean;
   accessToken: string | null;
   refreshToken: string | null;
+  marketId: string | null;
   setLoading: (arg0: boolean) => void;
   setAccessToken: (token: string) => void;
   refreshAccessToken: (token: string) => Promise<string | null>;
@@ -33,6 +35,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
+  const [marketId, setMarketId] = useState<string | null>(null);
   const router = useRouter()
 
   // Checker la validité du token refresh
@@ -70,10 +73,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = async () => {
     setAccessToken(null);
     setRefreshToken(null);
+    setMarketId(null)
 
     await AsyncStorage.removeItem('userId');
     await AsyncStorage.removeItem('accessToken');
     await AsyncStorage.removeItem('refreshToken');
+    await AsyncStorage.removeItem('marketId');
     router.replace('/');
     setUserId(null);
   };
@@ -86,10 +91,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const storedUserId = await AsyncStorage.getItem('userId');
       const storedAccessToken = await AsyncStorage.getItem('accessToken');
       const storedRefreshToken = await AsyncStorage.getItem('refreshToken');
+      const storedMarketId = await AsyncStorage.getItem('marketId')
+      
 
       console.log('Stored User ID:', storedUserId);
       console.log('Stored Access Token:', storedAccessToken);
       console.log('Stored Refresh Token:', storedRefreshToken);
+      console.log('Stored Market ID:', storedMarketId);
 
       if (!(storedUserId && storedRefreshToken)){ // En arrivant sur la page d'accueil, pas d'userId ou de refreshToken => logout()
         logout();
@@ -109,6 +117,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setAccessToken(newAccessToken);
             setRefreshToken(storedRefreshToken);
             setUserId(storedUserId);
+            setMarketId(storedMarketId)
             router.replace('/(tabs)/photo');
           }
         }
@@ -136,26 +145,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string): Promise<{ success: boolean; message?: string }> => {
     try {
       setLoading(true);
-      console.log('Entrée dans la fonction login de l"AuthContext');
-      console.log(`appel API au : ${backend_url()}token/`)
       const response = await axios.post<AuthResponse>(`${backend_url()}token/`, { email, password });
-      console.log(response)
-      if (response.data.access && response.data.refresh && response.data.user_id) {
-        console.log('Data retrieved !');
+      if (response.data.access && response.data.refresh && response.data.user_id && response.data.market_id) {
         const user_id_string = response.data.user_id.toString()
+        const market_id_string = response.data.market_id.toString()
         // Stockage des données dans l'asyncStorage
         await AsyncStorage.setItem('accessToken', response.data.access);
         await AsyncStorage.setItem('refreshToken', response.data.refresh);
         await AsyncStorage.setItem('user_id', user_id_string)
+        await AsyncStorage.setItem('market_id', market_id_string)
         
         // Stockage des données dans les états
         setAccessToken(response.data.access);
         setRefreshToken(response.data.refresh);
         setUserId(user_id_string)
+        setMarketId(market_id_string)
 
         // Redirection de l'utilisateur sur la page photo
         router.replace('(tabs)/photo');
-        console.log('Redirecting to photo page');
         return { success: true, message: `Connexion réussie de l'utilisateur ID: ${userId}` };
         }
       else {
@@ -187,7 +194,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 
   return (
-    <AuthContext.Provider value={{ userId, loading, accessToken, refreshToken, setLoading, setAccessToken, refreshAccessToken, login, logout }}>
+    <AuthContext.Provider value={{ userId, marketId, loading, accessToken, refreshToken, setLoading, setAccessToken, refreshAccessToken, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
