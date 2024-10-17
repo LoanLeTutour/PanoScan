@@ -50,12 +50,10 @@ class FormatProduct(models.Model):
 class ProductType(models.Model):
     name = models.CharField(max_length=100)
     active = models.BooleanField(default=True)
-    format = models.ForeignKey(FormatProduct, on_delete=models.CASCADE, related_name='product_types', blank=True, null=True )
-    thickness_in_mm = models.FloatField()
     producer = models.ForeignKey(Producer, on_delete=models.CASCADE, related_name='product_types')
     
     def __str__(self) -> str:
-        return f'{self.name} - {self.producer} - {self.format.length_in_mm}x{self.format.width_in_mm}x{self.thickness_in_mm}' 
+        return f'{self.name} - id:{self.id} - {self.producer.name}' 
     
     @transaction.atomic
     def disable(self):
@@ -182,9 +180,11 @@ class StructuresForDecor(models.Model):
 class FinalProduct(models.Model):
     decor_collection_structure = models.ForeignKey(StructuresForDecor, on_delete=models.CASCADE, default=1, related_name='final_products')
     product_type = models.ForeignKey(ProductType, on_delete=models.CASCADE, related_name='final_products')
+    format = models.ForeignKey(FormatProduct, on_delete=models.CASCADE, related_name='final_products', blank=True, null=True )
+    thickness_in_mm = models.FloatField(null=True, blank=True)
     active = models.BooleanField(default=True)
     
     def __str__(self) -> str:
-        return f'{self.product_type.name}-{self.decor_collection_structure.decor_collection.decor.code}{self.decor_collection_structure.structure.code}-{self.product_type.thickness_in_mm}mm'
+        return f'{self.product_type.name}- id:{self.product_type.id}-{self.decor_collection_structure.decor_collection.decor.code}{self.decor_collection_structure.structure.code}-{self.thickness_in_mm}mm'
     class Meta:
-        unique_together = ('decor_collection_structure', 'product_type')
+        unique_together = ('decor_collection_structure', 'product_type', 'format', 'thickness_in_mm')
