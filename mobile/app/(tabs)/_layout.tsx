@@ -38,6 +38,15 @@ export default function TabLayout() {
             <Ionicons name="images" color={color} size={size}/>,
         }}
       />
+      <Tabs.Screen
+        name="catalogue"
+        options={{
+          title: 'Catalogue',
+          tabBarLabel: 'Catalogue',
+          tabBarIcon: ({color, size}) => 
+            <Ionicons name="book" color={color} size={size}/>,
+        }}
+      />
     </Tabs>
   );
 }
