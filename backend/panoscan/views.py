@@ -280,6 +280,85 @@ class PhotoUserViewSet(ModelViewSet):
         queryset = PhotoUser.objects.filter(user__id=pk, active=True).order_by('-uploaded_at')
         serializer = PhotoUserSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    @action(detail=True, methods=['get'])
+    def producers(self, request, pk=None):
+        market_id = request.query_params.get('market_id')
+        if not market_id:
+            return Response({'error': 'market_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+        collectionsQueryset = Collection.objects.filter(market__id=market_id, active=True)
+        producersQueryset = Producer.objects.filter(collections__in=collectionsQueryset).distinct()
+        serializer = ProducerDetailSerializer(producersQueryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    @action(detail=True, methods=['get'])
+    def collections(self, request, pk=None):
+        market_id = request.query_params.get('market_id')
+        if not market_id:
+            return Response({'error': 'market_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+        producer_id = request.query_params.get('producer_id')
+        if not producer_id:
+            return Response({'error': 'producer_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+        queryset = Collection.objects.filter(market__id=market_id, producer__id=producer_id, active=True)
+        serializer = CollectionListSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    @action(detail=True, methods=['get'])
+    def decors(self, request, pk=None):
+        market_id = request.query_params.get('market_id')
+        if not market_id:
+            return Response({'error': 'market_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+        producer_id = request.query_params.get('producer_id')
+        if not producer_id:
+            return Response({'error': 'producer_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+        tempQueryset = Collection.objects.filter(market__id=market_id,producer__id=producer_id, active=True)
+        temp2Queryset = DecorsForCollection.objects.filter(collection__in=tempQueryset).distinct()
+        alternativeSerializer = DecorsForCollectionListSerializer(temp2Queryset, many=True)
+        return Response(alternativeSerializer.data, status=status.HTTP_200_OK)
+    @action(detail=True, methods=['get'])
+    def structures(self, request, pk=None):
+        collection_id = request.query_params.get('collection_id')
+        if not collection_id:
+            return Response({'error': 'collection_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+        decor_id = request.query_params.get('decor_id')
+        if not decor_id:
+            return Response({'error': 'decor_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+        decor_collection = DecorsForCollection.objects.filter(collection__in=collection_id, decor__id=decor_id)
+        queryset = StructuresForDecor.objects.filter(decor_collection__in=decor_collection, active=True)
+        serializer = StructuresForDecorListSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    @action(detail=True, methods=['get'])
+    def product_types(self, request, pk=None):
+        decor_collection_structure_id = request.query_params.get('structure_id')
+        if not decor_collection_structure_id:
+            return Response({'error': 'structure_decor_collection_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+        final_products_queryset = FinalProduct.objects.filter(decor_collection_structure__id=decor_collection_structure_id)
+        product_type_ids = final_products_queryset.values_list('product_type', flat=True).distinct()
+        product_types = ProductType.objects.filter(id__in=product_type_ids).values('id', 'name', 'photo_url')
+        queryset = list(product_types)
+        return Response(queryset, status=status.HTTP_200_OK)
+    @action(detail=True, methods=['get'])
+    def final_products(self, request, pk=None):
+        decor_collection_structure_id = request.query_params.get('structure_id')
+        if not decor_collection_structure_id:
+            return Response({'error': 'structure_decor_collection_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+        product_type_id = request.query_params.get('product_type_id')
+        if not product_type_id:
+            return Response({'error': 'product_type_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+        final_products_queryset = FinalProduct.objects.filter(decor_collection_structure__id=decor_collection_structure_id, product_type__id=product_type_id)
+        print(f"final_products queryset : {final_products_queryset}")
+        distinct_formats_ids = final_products_queryset.values_list('format', flat=True).distinct()
+        print(f"Liste des ids des formats uniques : {distinct_formats_ids}")
+        distinct_formats = FormatProduct.objects.filter(id__in=distinct_formats_ids).values('length_in_mm', 'width_in_mm')
+        print(f"Queryset des formats uniques : {distinct_formats}")
+        distinct_formats_list = list(distinct_formats)
+        print(f"Liste des formats uniques : {distinct_formats_list}")
+        distinct_thicknesses = list(final_products_queryset.values_list('thickness_in_mm', flat=True).distinct())
+        print(f"Liste des épaisseurs uniques : {distinct_thicknesses}")
+        serializer = FinalProductSerializer(final_products_queryset, many=True)
+        return Response({'distinct_formats': distinct_formats_list,
+                         'distinct_thicknesses': distinct_thicknesses,
+                         'final_products': serializer.data},
+                         status=status.HTTP_200_OK
+                         )
+
 
 class PhotoUserDeactivateView(APIView):
     def patch(self, request, id, format=None):
