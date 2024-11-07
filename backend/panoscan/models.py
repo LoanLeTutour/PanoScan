@@ -51,6 +51,7 @@ class ProductType(models.Model):
     name = models.CharField(max_length=100)
     active = models.BooleanField(default=True)
     producer = models.ForeignKey(Producer, on_delete=models.CASCADE, related_name='product_types')
+    photo_url = models.CharField(max_length=300, null=True, blank=True)
     
     def __str__(self) -> str:
         return f'{self.name} - id:{self.id} - {self.producer.name}' 
@@ -176,7 +177,6 @@ class StructuresForDecor(models.Model):
         self.save()
         self.final_products.update(active=False)
     
-    
 
 class FinalProduct(models.Model):
     decor_collection_structure = models.ForeignKey(StructuresForDecor, on_delete=models.CASCADE, default=1, related_name='final_products')
@@ -184,8 +184,10 @@ class FinalProduct(models.Model):
     format = models.ForeignKey(FormatProduct, on_delete=models.CASCADE, related_name='final_products', blank=True, null=True )
     thickness_in_mm = models.FloatField(null=True, blank=True)
     active = models.BooleanField(default=True)
+    NOYAUX = [('brun','brun' ),('noir','noir' ),('beige','beige' ),('blanc','blanc' ),('gris clair','gris clair' )]
+    noyau = models.CharField(choices=NOYAUX, null=True, blank=True, max_length=15)
     
     def __str__(self) -> str:
         return f'{self.product_type.name}- id:{self.product_type.id}-{self.decor_collection_structure.decor_collection.decor.code}{self.decor_collection_structure.structure.code}-{self.thickness_in_mm}mm'
     class Meta:
-        unique_together = ('decor_collection_structure', 'product_type', 'format', 'thickness_in_mm')
+        unique_together = ('decor_collection_structure', 'product_type', 'format', 'thickness_in_mm', 'noyau')
