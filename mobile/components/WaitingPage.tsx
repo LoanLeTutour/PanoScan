@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Image, Animated, Easing } from 'react-native';
+
 import { styles } from './WaitingPage.styles';
 // Fonction pour créer l'animation
 const createAnimation = (delay: number) => {
