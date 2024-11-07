@@ -53,13 +53,13 @@ class StructureDetailSerializer(ModelSerializer):
     producer = ProducerListSerializer()
     class Meta:
         model = Structure
-        fields = ['id', 'name', 'code', 'producer']
+        fields = ['id', 'name', 'code', 'producer', 'photo_url']
 
 class StructureListSerializer(ModelSerializer):
     producer = ProducerListSerializer()
     class Meta:
         model = Structure
-        fields = ['code', 'producer']
+        fields = ['id', 'code', 'producer']
 # FormatProduct serializers
 
 class FormatProductDetailSerializer(ModelSerializer):
@@ -74,22 +74,21 @@ class FormatProductListSerializer(ModelSerializer):
 
 # ProductType serializers
 class ProductTypeDetailSerializer(ModelSerializer):
-    producer = ProducerListSerializer()
     class Meta:
         model = ProductType
-        fields = ['id', 'name', 'producer', 'length_in_mm', 'width_in_mm', 'thickness_in_mm']
+        fields = ['id', 'name', 'photo_url']
 
 class ProductTypeListSerializer(ModelSerializer):
     class Meta:
         model = ProductType
-        fields = ['name', 'length_in_mm', 'width_in_mm', 'thickness_in_mm']
+        fields = ['name']
 
 # Decor serializers
 class DecorDetailSerializer(ModelSerializer):
     producer = ProducerListSerializer()
     class Meta:
         model = Decor
-        fields = ['id','code', 'image', 'producer']
+        fields = ['id','code','name', 'photo_url', 'producer']
 
 class DecorListSerializer(ModelSerializer):
     class Meta:
@@ -115,7 +114,7 @@ class CollectionListSerializer(ModelSerializer):
     market = MarketListSerializer()
     class Meta:
         model = Collection
-        fields = ['name', 'producer', 'market']
+        fields = ['id','name', 'producer', 'market']
 
 # DecorsCollection serializers
 class DecorsForCollectionDetailSerializer(ModelSerializer):
@@ -130,28 +129,39 @@ class DecorsForCollectionDetailSerializer(ModelSerializer):
         serializer = StructureListSerializer(queryset, many=True)
         return serializer.data
 class DecorsForCollectionListSerializer(ModelSerializer):
-    decor = DecorListSerializer()
+    decor = DecorDetailSerializer()
     collection = CollectionListSerializer()
     class Meta:
         model = DecorsForCollection
-        fields = ['decor','collection']
+        fields = ['id', 'decor','collection']
 
-class StructuresForDecorSerializer(ModelSerializer):
+class StructuresForDecorDetailSerializer(ModelSerializer):
     product_types = SerializerMethodField()
     decor_collection = DecorsForCollectionListSerializer()
-    structure = StructureListSerializer()
+    structure = StructureDetailSerializer()
     class Meta:
         model = StructuresForDecor
         fields = ['id', 'decor_collection', 'structure', 'product_types']
-    def get_product_type(self, instance):
+    def get_product_types(self, instance):
         queryset = instance.product_types.filter(active=True)
         serializer = ProductTypeListSerializer(queryset, many=True)
         return serializer.data
 
+class StructuresForDecorListSerializer(ModelSerializer):
+    decor_collection = DecorsForCollectionListSerializer()
+    structure = StructureDetailSerializer()
+    class Meta:
+        model = StructuresForDecor
+        fields = ['id', 'decor_collection', 'structure']
+
 class FinalProductSerializer(ModelSerializer):
+    decor_collection_structure = StructuresForDecorListSerializer()
+    product_type = ProductTypeDetailSerializer()
+    format = FormatProductListSerializer()
+
     class Meta:
         model = FinalProduct
-        fields = ['id', 'decor_collection_structure', 'product_type']
+        fields = ['id', 'decor_collection_structure', 'product_type', 'format', 'thickness_in_mm']
 
 class PhotoUserSerializer(ModelSerializer):
     class Meta:
