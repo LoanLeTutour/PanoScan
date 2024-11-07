@@ -69,6 +69,7 @@ class Structure(models.Model):
     code = models.CharField(max_length=10)
     active = models.BooleanField(default=True)
     producer = models.ForeignKey(Producer, on_delete=models.CASCADE, related_name='structures')
+    photo_url = models.CharField(max_length=300, null=True, blank=True)
     
     def __str__(self) -> str:
         return f'{self.code}-{self.producer}'
