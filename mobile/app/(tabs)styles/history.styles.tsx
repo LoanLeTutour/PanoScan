@@ -1,5 +1,7 @@
-import {Colors} from "@/constants/Colors";
 import { StyleSheet } from "react-native";
+
+import {Colors} from "@/constants/Colors";
+
 
 const styles = StyleSheet.create({
     background:{
@@ -7,9 +9,14 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
     },
     container:{
-        flexGrow:1,
+        flex: 1,
         backgroundColor: Colors.white,
-        padding: 10,
+    },
+
+    flatListContainer: {
+        flexGrow:1,
+        padding: 15,
+        gap:15
 
     },
     titleContainer: {
@@ -24,15 +31,18 @@ const styles = StyleSheet.create({
         fontSize: 18
     },
     noDataContainer: {
-        flex: 1,
+        flexGrow: 1,
+        padding: 20,
         alignSelf: 'center',
+        gap: 20,
         justifyContent: 'center',
-        gap: 20
+        marginTop: '50%'
     },
     textNoData: {
         alignSelf: 'center',
         fontWeight: 'bold',
-        fontSize: 18
+        fontSize: 18,
+        color: Colors.secondary
     },
     buttonRedirect: {
         alignSelf: 'center',
@@ -46,7 +56,11 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: Colors.white,
         fontSize: 18,
-    }
+    },
+    backButton: {
+        position: 'absolute',
+        left: 10
+    },
 });
 
 export default styles;

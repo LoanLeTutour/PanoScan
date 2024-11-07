@@ -1,5 +1,7 @@
-import {Colors} from "@/constants/Colors";
 import { StyleSheet } from "react-native";
+
+import {Colors} from "@/constants/Colors";
+
 
 const styles = StyleSheet.create({
     container: {
@@ -8,7 +10,6 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         padding:15,
         gap: 15,
-        marginBottom: 10,
         elevation: 10,
         shadowColor: Colors.secondary,   
     },
@@ -36,11 +37,14 @@ const styles = StyleSheet.create({
     infoContainer:{
         width: '55%',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        textAlign: 'center',
+        justifyContent: 'space-between',
+        gap: 10
     },
     idemContainer: {
+        textAlign: 'center',
         alignItems: 'center',
-        gap : 5
+        gap : 3
     },
     buttonContainer:{
         flexDirection: 'row',
@@ -63,6 +67,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     text:{
+        textAlign: 'center',
         color: Colors.white,
         fontWeight: 'bold',
     },

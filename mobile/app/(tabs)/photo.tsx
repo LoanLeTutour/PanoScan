@@ -10,6 +10,7 @@ import { CameraView, useCameraPermissions, CameraType, FlashMode } from "expo-ca
 import { Ionicons } from "@expo/vector-icons";
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
+import { router } from "expo-router";
 
 
 import styles from "../(tabs)styles/photo.styles";
@@ -17,6 +18,7 @@ import { backend_url } from "@/constants/backend_url";
 import { useAuth } from "../context/AuthContext";
 import { usePhotos } from "../context/PhotoContext";
 import LoadingSpinner from "@/components/WaitingPage";
+
 
 
 const imgDir = FileSystem.documentDirectory + 'photos/';
@@ -29,7 +31,7 @@ const ensureDirExists = async () => {
 };
 
 const HomePage: React.FC = () => {
-  const {userId, loading, accessToken, refreshToken, setLoading, refreshAccessToken, logout} = useAuth()
+  const {userId,marketId, loading, accessToken, refreshToken, setLoading, refreshAccessToken, logout} = useAuth()
   const { fetchPhotos} = usePhotos();
   const [permission, requestPermission] = useCameraPermissions();
   const [image, setImage] = useState<string>("");
@@ -215,6 +217,9 @@ const HomePage: React.FC = () => {
           console.error('Failed to refresh access token')
           return;
         }
+
+        const market_id = marketId || "";
+        console.log(`Market_id => ${market_id}`)
         
         const uploadResponse = await FileSystem.uploadAsync(
           `${backend_url()}upload/`,
@@ -223,15 +228,21 @@ const HomePage: React.FC = () => {
             httpMethod: 'POST',
             uploadType: FileSystem.FileSystemUploadType.MULTIPART,
             fieldName: 'photo',
+            parameters: {
+              market_id: market_id
+            },
             headers: {
               Authorization: `Bearer ${tokenToUse}`,
-            },
+            }
+            
           }
         );
   
         if (uploadResponse.status === 201) {
           fetchPhotos();
           setImage("")
+          const uploadedPhotoId = JSON.parse(uploadResponse.body).id; // Extraction de l'ID de la réponse
+          router.push({ pathname: '/(tabs)/history', params: { selectedPhotoId: uploadedPhotoId.toString() } });
         } else {
           console.error(`Failed to upload image. Status: ${uploadResponse.status}`)
           

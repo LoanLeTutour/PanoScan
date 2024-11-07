@@ -7,10 +7,21 @@ export type PhotoUserType = {
   LocalUri: string;
   active: boolean;
   photo_url: string;
-  result: object;
+  result: ResultType[];
   uploaded_at: string;
   user: number;
 };
+
+type ResultType = {
+  producer: string;
+  decor_collection_id: number;
+  photo_url: string;
+  collection_name: string;
+  decor_name: string;
+  decor_code: string;
+  producer_name: string;
+  producer_id: number
+}
 
 type PhotoContextType = {
   photos: PhotoUserType[];
