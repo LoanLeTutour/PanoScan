@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
+import { Href } from 'expo-router';
 
-import api from './ApiContext';
+
 import { backend_url } from '@/constants/backend_url';
 
 // Contexte d'authentification 
@@ -24,8 +25,9 @@ type AuthContextType = {
   setLoading: (arg0: boolean) => void;
   setAccessToken: (token: string) => void;
   refreshAccessToken: (token: string) => Promise<string | null>;
-  login: (email: string, password: string) => Promise<any>;
+  login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
+  api: AxiosInstance
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -38,15 +40,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [marketId, setMarketId] = useState<string | null>(null);
   const router = useRouter()
 
+  const api = axios.create({ baseURL: backend_url() });
+
   // Checker la validité du token refresh
   const checkRefreshTokenValidity = async (token: string): Promise<boolean> => {
     console.log('verifying the validity of refresh token...')
     try {
-      const response = await api.post(`${backend_url()}token/verify/`, { token });
-      if (response.status === 200){return true}
-      else {throw Error}
+      const response = await api.post(`/token/verify/`, { token });
+      return response.status === 200
       } catch (error) {
-      console.log(error)
+      console.log('Token verification failed: ', error)
       return false;
     }
   };
@@ -54,14 +57,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Rafraichir l'access token à l'aide du refresh token
     const refreshAccessToken = async (token: string): Promise<string | null> => {
       try {
-        const response = await api.post(`${backend_url()}token/refresh/`, { refresh: token });
-        if (response.data && response.data.access) {
+        const response = await api.post(`/token/refresh/`, { refresh: token });
+        if (response.data && response.data?.access) {
           await AsyncStorage.setItem('accessToken', response.data.access);
           setAccessToken(response.data.access);
+          api.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
           return response.data.access;
         }else {
           console.error('No access token in the response')
-          throw Error
+          return null
         }
       } catch (error) {
         console.error('Failed to refresh access token', error)
@@ -69,18 +73,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     };
 
+
+    // Axios interceptor to handle token expiration
+  api.interceptors.response.use(
+    response => response,
+    async error => {
+      const originalRequest = error.config;
+      console.log('Error status:', error.response?.status);  // Log status
+      console.log('Retry:', !originalRequest._retry);  // Log retry attempt
+      if (error.response?.status === 401 && refreshToken && !originalRequest._retry) {
+        originalRequest._retry = true;
+        const newAccessToken = await refreshAccessToken(refreshToken);
+        if (newAccessToken) {
+          originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+          return api(originalRequest);
+        } else {
+          logout();
+        }
+      }
+      return Promise.reject(error);
+    }
+  );
+
   // Logique de déconnexion
   const logout = async () => {
     setAccessToken(null);
     setRefreshToken(null);
     setMarketId(null)
-
+    setUserId(null);
     await AsyncStorage.removeItem('userId');
     await AsyncStorage.removeItem('accessToken');
     await AsyncStorage.removeItem('refreshToken');
     await AsyncStorage.removeItem('marketId');
     router.replace('/');
-    setUserId(null);
+    
   };
 
 
@@ -145,15 +171,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string): Promise<{ success: boolean; message?: string }> => {
     try {
       setLoading(true);
-      const response = await axios.post<AuthResponse>(`${backend_url()}token/`, { email, password });
+      const response = await api.post<AuthResponse>(`/token/`, { email, password });
       if (response.data.access && response.data.refresh && response.data.user_id && response.data.market_id) {
         const user_id_string = response.data.user_id.toString()
         const market_id_string = response.data.market_id.toString()
         // Stockage des données dans l'asyncStorage
         await AsyncStorage.setItem('accessToken', response.data.access);
         await AsyncStorage.setItem('refreshToken', response.data.refresh);
-        await AsyncStorage.setItem('user_id', user_id_string)
-        await AsyncStorage.setItem('market_id', market_id_string)
+        await AsyncStorage.setItem('userId', user_id_string)
+        await AsyncStorage.setItem('marketId', market_id_string)
         
         // Stockage des données dans les états
         setAccessToken(response.data.access);
@@ -162,7 +188,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setMarketId(market_id_string)
 
         // Redirection de l'utilisateur sur la page photo
-        router.replace('(tabs)/photo');
+        router.replace('(tabs)/photo' as Href<string | object>);
         return { success: true, message: `Connexion réussie de l'utilisateur ID: ${userId}` };
         }
       else {
@@ -194,7 +220,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 
   return (
-    <AuthContext.Provider value={{ userId, marketId, loading, accessToken, refreshToken, setLoading, setAccessToken, refreshAccessToken, login, logout }}>
+    <AuthContext.Provider value={{ userId, marketId, loading, accessToken, refreshToken, setLoading, setAccessToken, refreshAccessToken, login, logout, api }}>
       {children}
     </AuthContext.Provider>
   );
