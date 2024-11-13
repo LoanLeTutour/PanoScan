@@ -1,6 +1,9 @@
 import { StyleSheet } from "react-native";
 
 import {Colors} from "@/constants/Colors";
+import useScale from "@/constants/scales";
+
+const {verticalScale, horizontalScale} = useScale()
 
 
 const styles = StyleSheet.create({
@@ -11,34 +14,34 @@ const styles = StyleSheet.create({
     container:{
         flexGrow:1,
         backgroundColor: Colors.white,
-        padding: 15,
-        gap: 15,
+        padding: horizontalScale(15),
+        gap: verticalScale(15),
         alignItems: 'center',
         justifyContent: 'center'
     },
     titleContainer: {
         backgroundColor: Colors.primary,
-        marginTop: 10,
+        marginTop: verticalScale(10),
     },
     title: {
         alignSelf: 'center',
-        padding: 10,
+        padding: verticalScale(10),
         fontWeight: 'bold',
         color: Colors.white,
-        fontSize: 18
+        fontSize: verticalScale(18)
     },
     button:{
         alignItems: 'center',
-        padding:20,
+        padding: verticalScale(20),
         minWidth: '50%',
-        gap: 3,
+        gap: verticalScale(3),
         backgroundColor: Colors.primary,
-        borderRadius: 10,
-        elevation: 5,
+        borderRadius: verticalScale(10),
+        elevation: verticalScale(5),
         shadowColor: Colors.primary
     },
     textButton: {
-        fontSize: 20,
+        fontSize: verticalScale(20),
         fontWeight: 'bold',
         color: Colors.white
     },
@@ -47,10 +50,10 @@ const styles = StyleSheet.create({
     },
 
     subTitle: {
-        padding: 10,
+        padding: verticalScale(10),
         fontWeight: 'bold',
         color: Colors.secondary,
-        fontSize: 20,
+        fontSize: verticalScale(20),
         textAlign: 'center',
         flexWrap: 'wrap'
     },
@@ -59,12 +62,12 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
         justifyContent: 'center',
         alignItems: 'center',
-        minHeight: 80,
-        marginBottom: 20
+        minHeight: verticalScale(80),
+        marginBottom: verticalScale(20)
     },
     backButton: {
         position: 'absolute',
-        left: 10
+        left: horizontalScale(10)
     },
 
 })

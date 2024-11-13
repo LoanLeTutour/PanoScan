@@ -1,48 +1,54 @@
 import { StyleSheet} from "react-native";
 
 import { Colors } from "@/constants/Colors";
+import useScale from "@/constants/scales";
+
+const {verticalScale, horizontalScale} = useScale()
 
 const styles = StyleSheet.create({
     button:{
         alignItems: 'center',
         minWidth: '50%',
-        gap: 3,
-        borderRadius: 10,
-        elevation: 5,
+        gap: verticalScale(3),
+        borderRadius: verticalScale(10),
+        elevation: verticalScale(5),
     },
     textButton: {
-        fontSize: 20,
+        fontSize: verticalScale(20),
         fontWeight: 'bold',
         color: Colors.white
     },
     container: {
         width: '100%',
         backgroundColor: Colors.secondary,
-        borderRadius: 10,
-        padding:15,
-        elevation: 10,
-        shadowColor: Colors.secondary,   
+        borderRadius: verticalScale(10),
+        padding: verticalScale(15),
+        elevation: verticalScale(5),
+        shadowRadius: 5,
+        shadowOffset: {width: 0, height: 3},
+        shadowOpacity: 0.5,
+        shadowColor: Colors.secondary,    
     },
     overview:{
         flexDirection:'row',
-        borderRadius: 10,
+        borderRadius: verticalScale(10),
         backgroundColor: Colors.secondary,
     },
     imageContainer:{
         width: '45%',
         height: '100%',
-        borderRadius: 10,
+        borderRadius: verticalScale(10),
     },
     image:{
-        width: 140,
-        height:200,
-        borderRadius: 10,
+        width: horizontalScale(140),
+        height: verticalScale(200),
+        borderRadius: horizontalScale(10),
     },
     imageInfo:{
-        width: 140,
-        height:80,
-        borderRadius: 10,
-        marginTop: 10
+        width: horizontalScale(140),
+        height: verticalScale(80),
+        borderRadius: verticalScale(10),
+        marginTop: verticalScale(10)
     },
     infoContainer:{
         width: '55%',
@@ -51,7 +57,7 @@ const styles = StyleSheet.create({
     },
     idemContainer: {
         alignItems: 'center',
-        gap : 5
+        gap : verticalScale(5)
     },
     text:{
         color: Colors.white,
@@ -74,54 +80,53 @@ const styles = StyleSheet.create({
     },
     heading: {
         alignSelf: 'center',
-        marginBottom: 20,
-        width: 250,
+        marginBottom: verticalScale(20),
+        width: horizontalScale(250),
         alignItems: 'center',
     },
     closeModalButton: {
         alignSelf: 'flex-start',
-        margin: 10
+        margin: verticalScale(10)
     },
     modalTitle: {
         color: Colors.white,
         fontWeight: 'bold',
-        fontSize: 25,
+        fontSize: verticalScale(25),
     },
     modalSubtitle: {
         color: Colors.white,
-        fontSize: 15,
+        fontSize: verticalScale(15),
     },
     modalTextFormat:{
         color: Colors.white,
         fontWeight: 'bold',
-        fontSize: 15,
+        fontSize: verticalScale(14),
         textAlign: 'center',
-        width: 40,
-        flexWrap: 'wrap',
+        width: horizontalScale(42),
     },
     modalTextThicknesses:{
         color: Colors.white,
         fontWeight: 'bold',
-        fontSize: 15,
-        width: 36,
+        fontSize: verticalScale(14),
+        width: horizontalScale(36),
         textAlign: 'center',
     },
     content: {
         width: '100%',
         justifyContent: 'center', 
         alignItems: 'center',
-        padding: 20,
+        padding: verticalScale(20),
     },
     headingContent:{
         flexDirection: 'row',
-        marginBottom: 20,
-        marginLeft: 60,
-        gap: 30,
+        marginBottom: verticalScale(20),
+        marginLeft: horizontalScale(60),
+        gap: horizontalScale(27),
 
     },
     dataContent: {
         flexDirection: 'column',
-        gap: 20,
+        gap: horizontalScale(20),
     },
     row: {
         flexDirection: 'row',
@@ -129,8 +134,8 @@ const styles = StyleSheet.create({
     },
     dotContainer: {
         flexDirection: 'row',
-        marginLeft: 24,
-        gap: 54,
+        marginLeft: horizontalScale(26),
+        gap: horizontalScale(53),
     },
 })
 

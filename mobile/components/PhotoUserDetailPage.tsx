@@ -54,7 +54,7 @@ const PhotoUserDetailPage: React.FC<PhotoUserPageType> = ({
     const day = date.slice(8, 10);
     const hour = date.slice(11, 13);
     const minutes = date.slice(14, 16);
-    return `Prise le ${day} ${str_month} ${year} à ${hour}h${minutes}`;
+    return {'date': `Prise le ${day} ${str_month} ${year}`, 'heure': `à ${hour}h${minutes}`}
   };
 
   const handleBackToHistory = () => {
@@ -75,8 +75,11 @@ const PhotoUserDetailPage: React.FC<PhotoUserPageType> = ({
       <View style={styles.photoUserContainer}>
         <View style={styles.photoUserHeader}>
           <View style={styles.subTitleContainer}>
-            <Text style={styles.subTitle}>
-              {formatting_Date(photo.uploaded_at)}
+            <Text style={styles.subTitleText}>
+              {formatting_Date(photo.uploaded_at).date}
+            </Text>
+            <Text style={styles.subTitleText}>
+              {formatting_Date(photo.uploaded_at).heure}
             </Text>
           </View>
         </View>
@@ -106,7 +109,7 @@ const PhotoUserDetailPage: React.FC<PhotoUserPageType> = ({
   const PredictionHeader = () => {
     return (
       <View style={styles.predictionsHeaderContainer}>
-        <Text style={styles.subTitle}>Predictions:</Text>
+        <Text style={styles.subTitleText}>Predictions:</Text>
       </View>
     );
   };

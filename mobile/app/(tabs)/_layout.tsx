@@ -1,19 +1,23 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Ionicons } from '@expo/vector-icons';
 
+import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
+import useScale from '@/constants/scales';
+
+
 
 
 export default function TabLayout() {
+  const {verticalScale} = useScale()
 
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.secondary,
-        tabBarStyle: {height: 60},
-        tabBarLabelStyle: {marginBottom: 10},
+        tabBarStyle: {height: verticalScale(90), alignItems: 'center', justifyContent: 'center'},
+        tabBarLabelStyle: {marginBottom: verticalScale(10)},
         tabBarActiveBackgroundColor: Colors.white,
         headerShown: false,
       }}>

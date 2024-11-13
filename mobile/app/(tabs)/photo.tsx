@@ -18,7 +18,7 @@ import { backend_url } from "@/constants/backend_url";
 import { useAuth } from "../context/AuthContext";
 import { usePhotos } from "../context/PhotoContext";
 import LoadingSpinner from "@/components/WaitingPage";
-
+import useScale from "@/constants/scales";
 
 
 const imgDir = FileSystem.documentDirectory + 'photos/';
@@ -33,11 +33,12 @@ const ensureDirExists = async () => {
 const HomePage: React.FC = () => {
   const {userId,marketId, loading, accessToken, refreshToken, setLoading, refreshAccessToken, logout} = useAuth()
   const { fetchPhotos} = usePhotos();
-  const [permission, requestPermission] = useCameraPermissions();
+  const [permission, RequestPermissionMethod] = useCameraPermissions();
   const [image, setImage] = useState<string>("");
   const [facing, setFacing] = useState<CameraType>('back');
   const [flashMode, setflashMode] = useState<FlashMode>('off');
   const cameraRef = useRef<CameraView>(null);
+  const { verticalScale} = useScale()
 
   if (!permission) {
     // Camera permissions are still loading.
@@ -48,23 +49,21 @@ const HomePage: React.FC = () => {
     // Camera permissions are not granted yet.
     return (
       <View style={[styles.container, {justifyContent:'center'}]}>
-        <Text style={{ textAlign: 'center'}}>Une permission d'accès à la caméra est requise</Text>
-        <Button onPress={requestPermission} title="donner la permission" />
+        <Text style={{ textAlign: 'center', marginBottom: verticalScale(20)}}>Une permission d'accès à la caméra est requise</Text>
+        <Button onPress={RequestPermissionMethod} title="Donner la permission" />
       </View>
     );
   }
 
   const toggleCameraFacing = () => {
-    setFacing(current => (current === 'back' ? 'front' : 'back'));
-  console.log(facing)}
+    setFacing(current => (current === 'back' ? 'front' : 'back'));}
 
   // Commande pour tester ponctuellement l'authentification
   /*const toggleCameraFacing = () => {
     logout()}*/
 
   const toggleFlashMode = () => {
-    setflashMode(current => (current === 'on' ? 'off' : 'on'));
-    console.log(flashMode)}
+    setflashMode(current => (current === 'on' ? 'off' : 'on'));}
 
 
   const FlashIcon = () => {
@@ -72,7 +71,7 @@ const HomePage: React.FC = () => {
       return(<Ionicons
         name="flash-off"
         color="grey"
-        size={30}
+        size={verticalScale(30)}
         style={styles.icons}
       />)
     }
@@ -80,7 +79,7 @@ const HomePage: React.FC = () => {
       return (<Ionicons 
         name="flash" 
         color="white" 
-        size={30} 
+        size={verticalScale(30)} 
         style={styles.icons} />)
     }
   }
@@ -149,14 +148,14 @@ const HomePage: React.FC = () => {
             onPress={uploadPhoto}
           >
             <Text style={styles.textResult}>Tester</Text>
-            <Ionicons name="search" color="white" size={30} />
+            <Ionicons name="search" color="white" size={verticalScale(30)} />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.buttonTakenImage}
             onPress={removeImage}
           >
             <Text style={styles.textResult}>Supprimer</Text>
-            <Ionicons name="trash" color="white" size={30} />
+            <Ionicons name="trash" color="white" size={verticalScale(30)} />
           </TouchableOpacity>
         </View>
       </View>
@@ -177,7 +176,7 @@ const HomePage: React.FC = () => {
               <FlashIcon />
             </TouchableOpacity>
             <TouchableOpacity onPress={toggleCameraFacing}>
-              <Ionicons name="camera-reverse" color="white" size={30} />
+              <Ionicons name="camera-reverse" color="white" size={verticalScale(30)} />
             </TouchableOpacity>
           </View>
           <View style={styles.bottomButtonsContainer}>
@@ -187,7 +186,7 @@ const HomePage: React.FC = () => {
                 style={styles.uploadingButton}
                 onPress={selectImage}
               >
-                <Ionicons name="download" color="white" size={70} />
+                <Ionicons name="download" color="white" size={verticalScale(70)} />
               </TouchableOpacity>
             </View>
           </View>

@@ -5,6 +5,7 @@ import {
   Image,
   ActivityIndicator,
   Modal,
+  SafeAreaView
 } from "react-native";
 import { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -15,6 +16,7 @@ import { Colors } from "@/constants/Colors";
 import { useAuth } from "@/app/context/AuthContext";
 import { StructureDecorProps } from "@/app/(tabs)/catalogue";
 import LoadingSpinner from "./WaitingPage";
+import useScale from "@/constants/scales";
 
 interface ProductTypeCardProps {
   item: ProductTypeProps;
@@ -61,6 +63,7 @@ const ProductTypeCatalogueCard: React.FC<ProductTypeCardProps> = ({
     setLoading
   } = useAuth();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const {verticalScale, horizontalScale} = useScale()
 
   const handlePressProductType = (item: ProductTypeProps) => {
     setProductTypeSelected(item);
@@ -204,13 +207,13 @@ const ProductTypeCatalogueCard: React.FC<ProductTypeCardProps> = ({
         animationType="slide"
         onRequestClose={() => handleCloseModal()}
       >
-        <View style={styles.modalContainer}>
+        <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalView}>
             <TouchableOpacity
               onPress={() => handleCloseModal()}
               style={styles.closeModalButton}
             >
-              <Ionicons name="close-sharp" size={40} color={Colors.white} />
+              <Ionicons name="close-sharp" size={verticalScale(40)} color={Colors.white} />
             </TouchableOpacity>
             <View style={styles.heading}>
               <Text style={styles.modalTitle}>Stock usine</Text>
@@ -218,8 +221,8 @@ const ProductTypeCatalogueCard: React.FC<ProductTypeCardProps> = ({
               <Ionicons
                               name="ellipse-sharp"
                               color="green"
-                              size={20}
-                              style={{marginTop: 10}}
+                              size={verticalScale(20)}
+                              style={{marginTop: verticalScale(10)}}
                             />
             </View>
             <View style={styles.content}>
@@ -246,14 +249,14 @@ const ProductTypeCatalogueCard: React.FC<ProductTypeCardProps> = ({
                               key={indexFormat}
                               name="ellipse-sharp"
                               color="green"
-                              size={16}
+                              size={horizontalScale(16)}
                             />
                           ) : (
                             <Ionicons
                               key={indexFormat}
                               name="ellipse-outline"
                               color={Colors.black}
-                              size={16}
+                              size={horizontalScale(16)}
                             />
                           )
                       )}
@@ -264,7 +267,7 @@ const ProductTypeCatalogueCard: React.FC<ProductTypeCardProps> = ({
 
             </View>
           </View>
-        </View>
+        </SafeAreaView>
       </Modal>
     </View>
   ))

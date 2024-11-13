@@ -1,54 +1,58 @@
 import { StyleSheet } from "react-native";
 
 import { Colors } from "@/constants/Colors";
+import useScale from "@/constants/scales";
+
+const {verticalScale, horizontalScale} = useScale()
 
 const styles = StyleSheet.create({
     predictionItemContainer: {
         backgroundColor: Colors.secondary,
-        borderRadius: 10,
-        padding: 10,
-        elevation: 1,
+        borderRadius: verticalScale(10),
         zIndex: 1,
-
-    },
-    topContainer: {
-        flex: 1,
         flexDirection: 'row',
-        marginBottom: 15,
+        marginBottom: verticalScale(15),
+        padding: verticalScale(15),
+        elevation: verticalScale(5),
+        shadowRadius: 5,
+        shadowOffset: {width: 0, height: 3},
+        shadowOpacity: 0.5,
+        shadowColor: Colors.secondary
     },
-    leftTopContainer: {
+
+    leftContainer: {
         width: '50%',
         alignItems: 'center',
-        gap: 10
+        gap: verticalScale(10)
     },
     photoPrediction:{
-        width: 140,
-        height:100,
-        borderRadius: 10,
+        width: horizontalScale(140),
+        height: verticalScale(100),
+        borderRadius: verticalScale(10),
     },
-    rightTopContainer: {
+    rightContainer: {
         flex: 1,
         width: '50%',
-        padding: 10,
+        padding: verticalScale(10),
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 10
+        gap: verticalScale(10)
     },
     positionIconContainer: {
         backgroundColor: Colors.primary,
-        width: 35,
-        borderRadius: 100,
-        padding: 2
+        width: horizontalScale(35),
+        borderRadius: verticalScale(100),
+        padding: verticalScale(2)
     },
     positionText: {
         alignSelf: 'center',
-        fontSize: 25,
+        fontSize: verticalScale(25),
         color: Colors.white
     },
     textInfo: {
         color: Colors.white,
         fontWeight: 'bold',
-        fontSize: 15
+        fontSize: verticalScale(15)
 
 
     },
@@ -59,13 +63,13 @@ const styles = StyleSheet.create({
     buttonToCatalogue: {
         width: '45%',
         backgroundColor: Colors.primary,
-        paddingVertical: 20,
-        borderRadius: 10,
+        paddingVertical: verticalScale(20),
+        borderRadius: verticalScale(10),
     },
     textButtonToCatalogue :{
         color: Colors.white,
         fontWeight: 'bold',
-        fontSize: 18,
+        fontSize: verticalScale(18),
         alignSelf: 'center',
     },
     modalContainer:{
@@ -73,24 +77,24 @@ const styles = StyleSheet.create({
         justifyContent:'center',
         alignItems:'center',
         backgroundColor: Colors.secondary,
-        opacity: 0.9,
+        opacity: 1,
     },
     modalView:{
         alignItems: 'center',
-        padding: 30,
+        padding: verticalScale(30),
         
     },
     modalTitle:{
         color: Colors.white,
         fontWeight: 'bold',
-        fontSize: 25,
+        fontSize: verticalScale(25),
         textAlign: 'center',
-        marginBottom: 30
+        marginBottom: verticalScale(30)
     },
     modalText:{
         color: Colors.white,
         fontWeight: 'bold',
-        fontSize: 25,
+        fontSize: verticalScale(25),
         textAlign: 'center',
     },
     modalButtonContainer:{
@@ -103,15 +107,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: Colors.primary,
-        height: 100,
-        marginHorizontal: 10,
-        borderRadius: 10
-    },
-    imageModal:{
-        width: 280,
-        height:400,
-        borderRadius: 20,
-        margin: 20
+        height: verticalScale(100),
+        marginHorizontal: horizontalScale(10),
+        borderRadius: verticalScale(10)
     },
     loadingSpinner: {
         position: 'absolute',

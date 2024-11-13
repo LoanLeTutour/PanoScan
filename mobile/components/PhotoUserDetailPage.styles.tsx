@@ -1,58 +1,62 @@
 import { StyleSheet } from "react-native";
 
 import { Colors } from "@/constants/Colors";
+import useScale from "@/constants/scales";
+
+const {verticalScale, horizontalScale} = useScale()
 
 const styles = StyleSheet.create({
     mainHeaderContainer: {
         backgroundColor: Colors.primary,
-        marginTop: 10,
+        marginTop: verticalScale(10),
     },
     backButton: {
-        top: 74,
-        left: 10,
+        top: verticalScale(74),
+        left: horizontalScale(10),
         position: 'absolute',
     },
 
     title: {
         alignSelf: 'center',
-        padding: 10,
+        padding: verticalScale(10),
         fontWeight: 'bold',
         color: Colors.white,
-        fontSize: 18
+        fontSize: horizontalScale(20)
     },
     photoUserContainer: {
-        gap: 10,
+        gap: verticalScale(10),
+        marginBottom: verticalScale(20)
     },
     photoUserHeader: {
         flexDirection: 'row',
         backgroundColor: Colors.white,
         justifyContent: 'center',
         alignItems: 'center',
-        minHeight: 80,
+        minHeight: verticalScale(80),
     },
-    subTitle: {
-        padding: 10,
+    subTitleText: {
         color: Colors.secondary,
-        fontSize: 20,
+        fontSize: verticalScale(18),
         fontWeight: 'bold',
         textAlign: 'center',
         flexWrap: 'wrap',
     },
     subTitleContainer: {
-        maxWidth: '65%'
+        maxWidth: '65%',
+        padding: verticalScale(10),
     },
     photoContainer: {
         alignSelf: 'center',
         alignItems: 'center',
-        width: 280,
-        height:200,
-        borderRadius: 10,
+        width: horizontalScale(280),
+        height: verticalScale(200),
+        borderRadius: verticalScale(10),
     },
 
     photoUser:{
-        width: 280,
-        height:200,
-        borderRadius: 10,
+        width: horizontalScale(280),
+        height: verticalScale(200),
+        borderRadius: verticalScale(10),
     },
 
     loadingSpinner: {
@@ -64,10 +68,10 @@ const styles = StyleSheet.create({
       },
     
     predictionsHeaderContainer: {
-        padding: 10
+        padding: verticalScale(10)
     },
     predictionsContainer: {
-        paddingHorizontal: 15
+        paddingHorizontal: horizontalScale(15)
 
     },
     

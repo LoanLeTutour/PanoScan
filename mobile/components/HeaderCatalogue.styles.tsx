@@ -1,17 +1,20 @@
 import { StyleSheet } from "react-native"
 
 import { Colors } from "@/constants/Colors"
+import useScale from "@/constants/scales";
+
+const {verticalScale, horizontalScale} = useScale()
 
 const styles = StyleSheet.create({
     backButton: {
         position: 'absolute',
-        left: 10,
+        left: horizontalScale(10),
     },
     subTitle: {
-        padding: 10,
+        padding: verticalScale(10),
         fontWeight: 'bold',
         color: Colors.secondary,
-        fontSize: 20,
+        fontSize: verticalScale(20),
         textAlign: 'center',
         flexWrap: 'wrap'
     },
@@ -23,7 +26,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
         justifyContent: 'center',
         alignItems: 'center',
-        minHeight: 100,
+        minHeight: verticalScale(100),
     },
 })
 

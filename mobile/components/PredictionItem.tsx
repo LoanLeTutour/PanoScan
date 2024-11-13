@@ -3,8 +3,8 @@ import { useState } from "react";
 import { router } from "expo-router";
 
 import styles from "./PredictionItem.styles";
-
-
+import { Colors } from "@/constants/Colors";
+import useScale from "@/constants/scales";
 
 interface PredictionItemProps {
   item: SinglePredictionType;
@@ -29,15 +29,21 @@ const correctPhotoProducerSource = (url: string) => {
 const PredictionItem: React.FC<PredictionItemProps> = ({ item, index }) => {
   const [imageLoading, setImageLoading] = useState<boolean>(true);
   const [modalVisible, setModalVisible] = useState<boolean>(false)
-
+  const {verticalScale, horizontalScale} = useScale()
 
   return (
     <TouchableOpacity style={styles.predictionItemContainer} onPress={() => setModalVisible(true)}>
-      <View style={styles.topContainer}>
-        <View style={styles.leftTopContainer}>
+        <View style={styles.leftContainer}>
           <View style={styles.positionIconContainer}>
             <Text style={styles.positionText}>{index + 1}</Text>
           </View>
+          { imageLoading && (
+                    <ActivityIndicator
+                    style={[styles.loadingSpinner, {marginTop: verticalScale(30), marginLeft: horizontalScale(10)}]}
+                    size="large"
+                    color={Colors.primary}
+                    />
+                    )}
           <Image
             resizeMode="cover"
             style={styles.photoPrediction}
@@ -50,13 +56,12 @@ const PredictionItem: React.FC<PredictionItemProps> = ({ item, index }) => {
             }}
           />
         </View>
-        <View style={styles.rightTopContainer}>
+        <View style={styles.rightContainer}>
           <Text style={styles.textInfo}>{item.producer_name}</Text>
           <Text style={styles.textInfo}>Collection {item.collection_name}</Text>
           <Text style={styles.textInfo}>{item.decor_code}</Text>
           <Text style={styles.textInfo}>{item.decor_name}</Text>
         </View>
-      </View>
       <Modal 
             visible={modalVisible}
             transparent={true}

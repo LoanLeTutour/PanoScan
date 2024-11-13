@@ -1,17 +1,20 @@
 import { StyleSheet} from "react-native";
 
 import { Colors } from "@/constants/Colors";
+import useScale from "@/constants/scales";
+
+const {verticalScale, horizontalScale} = useScale()
 
 const styles = StyleSheet.create({
     button:{
         alignItems: 'center',
         minWidth: '50%',
-        gap: 3,
-        borderRadius: 10,
-        elevation: 5,
+        gap: verticalScale(3),
+        borderRadius: verticalScale(10),
+        elevation: verticalScale(5),
     },
     textButton: {
-        fontSize: 20,
+        fontSize: verticalScale(20),
         fontWeight: 'bold',
         color: Colors.white
     },
@@ -19,32 +22,35 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         width: '100%',
         backgroundColor: Colors.secondary,
-        borderRadius: 10,
-        padding: 15,
-        gap: 15,
-        elevation: 10,
-        shadowColor: Colors.secondary,   
+        borderRadius: verticalScale(10),
+        padding: verticalScale(15),
+        gap: verticalScale(15),
+        elevation: verticalScale(5),
+        shadowRadius: 5,
+        shadowOffset: {width: 0, height: 3},
+        shadowOpacity: 0.5,
+        shadowColor: Colors.secondary,    
     },
     overview:{
         flexDirection:'row',
-        borderRadius: 10,
+        borderRadius: verticalScale(10),
         backgroundColor: Colors.secondary,
     },
     imageContainer:{
         width: '45%',
         height: '100%',
-        borderRadius: 10,
+        borderRadius: verticalScale(10),
     },
     image:{
-        width: 140,
-        height:200,
-        borderRadius: 10,
+        width: horizontalScale(140),
+        height: verticalScale(200),
+        borderRadius: verticalScale(10),
     },
     imageInfo:{
-        width: 140,
-        height:80,
-        borderRadius: 10,
-        marginTop: 10
+        width: horizontalScale(140),
+        height: verticalScale(80),
+        borderRadius: verticalScale(10),
+        marginTop: verticalScale(10)
     },
     infoContainer:{
         width: '55%',
@@ -53,7 +59,7 @@ const styles = StyleSheet.create({
     },
     idemContainer: {
         alignItems: 'center',
-        gap : 5
+        gap : verticalScale(5)
     },
     text:{
         color: Colors.white,

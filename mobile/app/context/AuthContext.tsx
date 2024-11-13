@@ -100,12 +100,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setAccessToken(null);
     setRefreshToken(null);
     setMarketId(null)
-    setUserId(null);
+    
     await AsyncStorage.removeItem('userId');
     await AsyncStorage.removeItem('accessToken');
     await AsyncStorage.removeItem('refreshToken');
     await AsyncStorage.removeItem('marketId');
     router.replace('/');
+    setUserId(null);
     
   };
 

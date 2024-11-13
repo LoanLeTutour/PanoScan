@@ -1,6 +1,9 @@
 import { StyleSheet } from "react-native";
 
 import { Colors } from "@/constants/Colors";
+import useScale from "@/constants/scales";
+
+const {verticalScale, horizontalScale} = useScale()
 
 export const styles = StyleSheet.create({
     container: {
@@ -10,21 +13,21 @@ export const styles = StyleSheet.create({
       backgroundColor: Colors.white,
     },
     logoContainer: {
-      marginBottom: 20,
+      marginBottom: verticalScale(20),
     },
     logo: {
-      height: 300,
-      width: 300
+      height: verticalScale(300),
+      width: horizontalScale(300)
     },
     dotsContainer: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      width: 60,
+      width: horizontalScale(60),
     },
     dot: {
-      width: 12,
-      height: 12,
-      borderRadius: 6,
+      width: horizontalScale(12),
+      height: verticalScale(12),
+      borderRadius: verticalScale(6),
       backgroundColor: Colors.primary,
     },
   });

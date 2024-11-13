@@ -6,6 +6,7 @@ import styles from "./PhotoCard.styles";
 import {Colors} from "../constants/Colors";
 import { PhotoUserType } from "@/app/context/PhotoContext";
 import { useAuth } from "@/app/context/AuthContext";
+import useScale from "@/constants/scales";
 interface PhotoCardProps {
     item: PhotoUserType;
     index: number;
@@ -16,6 +17,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({item, index, fetchPhotos, setCurre
     const {accessToken,refreshToken, refreshAccessToken, setLoading, api} = useAuth()
     const [modalVisible, setModalVisible] = useState(false);
     const [imageLoading, setImageLoading] = useState(true);
+    const {verticalScale} = useScale()
 
     const handlePressPhoto = (item: PhotoUserType) => {
         setCurrentPhoto(item)
@@ -100,7 +102,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({item, index, fetchPhotos, setCurre
                     <Text style={styles.text}>{item.result[0]?.decor_code}</Text>
                     { imageLoading && (
                     <ActivityIndicator
-                    style={styles.loadingSpinner}
+                    style={[styles.loadingSpinner, {marginTop: verticalScale(40)}]}
                     size="large"
                     color={Colors.primary}
                     />

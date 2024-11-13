@@ -1,6 +1,9 @@
 import { StyleSheet } from "react-native"
 
 import {Colors} from "@/constants/Colors";
+import useScale from "@/constants/scales";
+
+const {verticalScale, horizontalScale} = useScale()
 
 
 const styles = StyleSheet.create({
@@ -12,8 +15,8 @@ const styles = StyleSheet.create({
     },
     camera: {
         flex:1,
-        borderRadius: 20,
-        padding: 30,
+        borderRadius: verticalScale(20),
+        padding: verticalScale(30),
     },
     buttonsContainer: {
         justifyContent: 'space-between',
@@ -21,13 +24,13 @@ const styles = StyleSheet.create({
     topButtonsContainer:{
         flex: 1,
         alignItems: 'flex-end',
-        gap: 30,
-        marginRight: 20,
-        marginTop: 30
+        gap: verticalScale(30),
+        marginRight: horizontalScale(20),
+        marginTop: verticalScale(30)
     },
     icons:{
-        height: 30,
-        width: 30,
+        height: verticalScale(30),
+        width: horizontalScale(30),
     },
     bottomButtonsContainer: {
         flexDirection: 'row',
@@ -38,17 +41,21 @@ const styles = StyleSheet.create({
     },
     
     capturingButtonContainer:{
-        borderRadius:70,
+        borderRadius: horizontalScale(100),
         borderColor:Colors.white,
-        borderWidth: 2,
+        borderWidth: horizontalScale(3),
         marginLeft: '40%',
+        height: horizontalScale(80),
+        width: horizontalScale(80),
+        justifyContent: 'center'
     },
     capturingButton:{
+        alignSelf: 'center',
         backgroundColor: Colors.white,
-        height: 70,
-        width: 70,
-        borderRadius:70,
-        borderWidth: 5,
+        height: horizontalScale(70),
+        width: horizontalScale(70),
+        borderRadius: horizontalScale(100),
+        borderWidth: horizontalScale(4),
         borderColor: Colors.black,
     },
     
@@ -63,24 +70,24 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
     },
     image: {
-        width: 350,
-        height: 533,
+        width: horizontalScale(350),
+        height: verticalScale(533),
         resizeMode: 'stretch',
         alignSelf: 'center',
-        borderRadius: 10,
+        borderRadius: verticalScale(10),
     },
     buttonTakenImage:{
         backgroundColor: Colors.primary,
-        padding: 10,
+        padding: verticalScale(10),
         alignItems: 'center',
         justifyContent: 'space-evenly',
-        width: 150,
-        borderRadius: 10,
+        width: horizontalScale(150),
+        borderRadius: horizontalScale(10),
     },
     textResult: {
         color: Colors.white,
         fontWeight: 'bold',
-        fontSize: 20,
+        fontSize: verticalScale(20),
     }
 
 })

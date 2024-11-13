@@ -1,50 +1,56 @@
 import { StyleSheet } from "react-native";
 
 import {Colors} from "@/constants/Colors";
+import useScale from "@/constants/scales";
 
+const {verticalScale, horizontalScale} = useScale()
 
 const styles = StyleSheet.create({
     container: {
         width: '100%',
         backgroundColor: Colors.secondary,
-        borderRadius: 10,
-        padding:15,
-        gap: 15,
-        elevation: 10,
-        shadowColor: Colors.secondary,   
+        borderRadius: verticalScale(10),
+        padding: verticalScale(15),
+        gap: verticalScale(15),
+        elevation: verticalScale(5),
+        shadowRadius: 5,
+        shadowOffset: {width: 0, height: 3},
+        shadowOpacity: 0.5,
+        shadowColor: Colors.secondary
     },
     overview:{
         flexDirection:'row',
-        borderRadius: 10,
+        borderRadius: verticalScale(10),
         backgroundColor: Colors.secondary,
+        height: verticalScale(200)
     },
     imageContainer:{
         width: '45%',
         height: '100%',
-        borderRadius: 10,
+        borderRadius: verticalScale(10),
     },
     image:{
-        width: 140,
-        height:200,
-        borderRadius: 10,
+        width: horizontalScale(140),
+        height: verticalScale(200),
+        borderRadius: verticalScale(10),
     },
     imageInfo:{
-        width: 140,
-        height:80,
-        borderRadius: 10,
-        marginTop: 10
+        width: horizontalScale(140),
+        height: verticalScale(80),
+        borderRadius: verticalScale(10),
+        marginTop: verticalScale(10)
     },
     infoContainer:{
         width: '55%',
         alignItems: 'center',
         textAlign: 'center',
         justifyContent: 'space-between',
-        gap: 10
+        gap: verticalScale(10)
     },
     idemContainer: {
         textAlign: 'center',
         alignItems: 'center',
-        gap : 3
+        gap : verticalScale(3)
     },
     buttonContainer:{
         flexDirection: 'row',
@@ -53,40 +59,41 @@ const styles = StyleSheet.create({
     },
     button:{
         alignItems: 'center',
-        padding:5,
-        gap: 3,
+        padding: verticalScale(5),
+        gap: verticalScale(3),
         backgroundColor: Colors.primary,
-        borderRadius: 10,
-        elevation: 5,
+        borderRadius: verticalScale(10),
+        elevation: verticalScale(5),
         shadowColor: Colors.primary,
 
     },
     buttonText:{
         color: Colors.white,
-        fontSize: 15,
+        fontSize: verticalScale(14),
         fontWeight: 'bold',
     },
     text:{
         textAlign: 'center',
         color: Colors.white,
         fontWeight: 'bold',
+        fontSize: horizontalScale(14)
     },
     modalContainer:{
         flex: 1,
         justifyContent:'center',
         alignItems:'center',
         backgroundColor: Colors.secondary,
-        opacity: 0.9
+        opacity: 1
     },
     modalView:{
         alignItems: 'center',
-        padding: 30,
+        padding: verticalScale(30),
         
     },
     modalText:{
         color: Colors.white,
         fontWeight: 'bold',
-        fontSize: 25,
+        fontSize: verticalScale(25),
         textAlign: 'center'
     },
     modalButtonContainer:{
@@ -99,15 +106,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: Colors.primary,
-        height: 100,
-        marginHorizontal: 10,
-        borderRadius: 10
+        height: verticalScale(100),
+        marginHorizontal: horizontalScale(10),
+        borderRadius: verticalScale(10)
     },
     imageModal:{
-        width: 280,
-        height:400,
-        borderRadius: 20,
-        margin: 20
+        width: horizontalScale(280),
+        height: verticalScale(400),
+        borderRadius: verticalScale(20),
+        margin: verticalScale(20)
     },
     loadingSpinner: {
         position: 'absolute',
